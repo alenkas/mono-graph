@@ -1,0 +1,151 @@
+[{
+    "datetime": "2016-05-11",
+    "fb": 0,
+    "play": 0,
+    "appstore": 0
+}, {
+    "datetime": "2016-05-12",
+    "fb": 2,
+    "play": 7,
+    "appstore": 8
+}, {
+    "datetime": "2016-05-13",
+    "fb": 4,
+    "play": 8,
+    "appstore": 18
+}, {
+    "datetime": "2016-05-14",
+    "fb": 5,
+    "play": 15,
+    "appstore": 20
+}, {
+    "datetime": "2016-05-15",
+    "fb": 13,
+    "play": 16,
+    "appstore": 23
+}, {
+    "datetime": "2016-05-16",
+    "fb": 20,
+    "play": 23,
+    "appstore": 24
+}, {
+    "datetime": "2016-05-17",
+    "fb": 24,
+    "play": 26,
+    "appstore": 32
+}, {
+    "datetime": "2016-05-18",
+    "fb": 26,
+    "play": 29,
+    "appstore": 41
+}, {
+    "datetime": "2016-05-19",
+    "fb": 26,
+    "play": 32,
+    "appstore": 47
+}, {
+    "datetime": "2016-05-20",
+    "fb": 33,
+    "play": 33,
+    "appstore": 54
+}, {
+    "datetime": "2016-05-21",
+    "fb": 33,
+    "play": 42,
+    "appstore": 59
+}, {
+    "datetime": "2016-05-22",
+    "fb": 38,
+    "play": 50,
+    "appstore": 69
+}, {
+    "datetime": "2016-05-23",
+    "fb": 48,
+    "play": 60,
+    "appstore": 77
+}, {
+    "datetime": "2016-05-24",
+    "fb": 53,
+    "play": 70,
+    "appstore": 87
+}, {
+    "datetime": "2016-05-25",
+    "fb": 62,
+    "play": 73,
+    "appstore": 91
+}, {
+    "datetime": "2016-05-26",
+    "fb": 66,
+    "play": 80,
+    "appstore": 97
+}, {
+    "datetime": "2016-05-27",
+    "fb": 74,
+    "play": 80,
+    "appstore": 98
+}, {
+    "datetime": "2016-05-28",
+    "fb": 79,
+    "play": 84,
+    "appstore": 102
+}, {
+    "datetime": "2016-05-29",
+    "fb": 79,
+    "play": 94,
+    "appstore": 104
+}, {
+    "datetime": "2016-05-30",
+    "fb": 81,
+    "play": 102,
+    "appstore": 110
+}, {
+    "datetime": "2016-05-31",
+    "fb": 82,
+    "play": 108,
+    "appstore": 115
+}, {
+    "datetime": "2016-06-01",
+    "fb": 83,
+    "play": 110,
+    "appstore": 117
+}, {
+    "datetime": "2016-06-02",
+    "fb": 83,
+    "play": 112,
+    "appstore": 125
+}, {
+    "datetime": "2016-06-03",
+    "fb": 90,
+    "play": 119,
+    "appstore": 125
+}, {
+    "datetime": "2016-06-04",
+    "fb": 93,
+    "play": 121,
+    "appstore": 125
+}, {
+    "datetime": "2016-06-05",
+    "fb": 96,
+    "play": 124,
+    "appstore": 130
+}, {
+    "datetime": "2016-06-06",
+    "fb": 104,
+    "play": 133,
+    "appstore": 138
+}, {
+    "datetime": "2016-06-07",
+    "fb": 110,
+    "play": 135,
+    "appstore": 144
+}, {
+    "datetime": "2016-06-08",
+    "fb": 116,
+    "play": 137,
+    "appstore": 150
+}, {
+    "datetime": "2016-06-09",
+    "fb": 117,
+    "play": 141,
+    "appstore": 150
+}]
