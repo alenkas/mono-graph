@@ -1,0 +1,19 @@
+chart:
+  ☐ on hover show tooltip forever on the right after the graph
+  ☐ change buttons with select possibility to choose several graphs
+  ☐ ajax load
+  ☐ on hover show lines to x and y axis
+  ☐ add buttons to choose period on which to show graph (weeks, months, etc)
+
+axis:
+  ☐ x axis should show day interval
+  ☐ on y axis huge numbers should be written like 1k,10k, etc
+
+bugs:
+  ☐ on update dots stay on their places
+  ☐ y axis shows incorrect highest number. it should show the highest number of all values in json
+  ☐ on update x axis moves
+  ☐ on hover over first two dots difference between values is not calculated. it shows infinity or NaN.
+
+refactoring: 
+  ☐ too many identical function. in that book there is a chapter in the end that says how to color different lines better
