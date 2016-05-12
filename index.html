@@ -56,6 +56,10 @@
             line-height: 20px;
         }
 
+        #controls {
+            display: inline-block;
+        }
+
         #fb .title {
             color: blue;
         }
@@ -104,16 +108,16 @@
             <p><span class="difference" data-store="appstore">20</span>%</p>
         </div>
     </div>
-</div>
-<div>
-    <button id="update">update</button>
-    <div>
-        <p>
-            <input id="show-all" type="checkbox" value="all"/><label for="show-all">Check/uncheck all</label><br/>
-            <input id="show-facebook" type="checkbox" value="fb"/><label for="show-facebook">Facebook</label> <br/>
-            <input id="show-playstore" type="checkbox" value="play"/><label for="show-playstore">Playstore</label> <br/>
-            <input id="show-appstore" type="checkbox" value="appstore"/><label for="show-appstore">Appstore</label>
-        </p>
+    <div id="controls">
+        <button id="update">update</button>
+        <div>
+            <p>
+                <input id="show-all" type="checkbox" value="all" checked/><label for="show-all">Check/uncheck all</label><br/>
+                <input id="show-facebook" type="checkbox" value="fb" checked/><label for="show-facebook">Facebook</label> <br/>
+                <input id="show-playstore" type="checkbox" value="play" checked/><label for="show-playstore">Playstore</label> <br/>
+                <input id="show-appstore" type="checkbox" value="appstore" checked/><label for="show-appstore">Appstore</label>
+            </p>
+        </div>
     </div>
 </div>
 <script src="main.js"></script>

@@ -292,76 +292,6 @@ function mouseover(d) {
         .style("color", "black");
 }
 
-function updateData() {
-    // Get the data again
-    d3.json(url, function (error, data) {
-        data.forEach(function (d) {
-            d.datetime = parseDate(d.datetime);
-            d.fb = +d.fb;
-            d.play = +d.play;
-            d.appstore = +d.appstore;
-        });
-        // Scale the range of the data again
-        x.domain(d3.extent(data, function (d) {
-            return d.datetime;
-        }));
-        y.domain([0, d3.max(data, function (d) {
-            return d.fb;
-        })]);
-        y1.domain([0, d3.max(data, function (d) {
-            return d.play;
-        })]);
-        y2.domain([0, d3.max(data, function (d) {
-            return d.appstore;
-        })]);
-
-        // Select the section we want to apply our changes to
-        var svg = d3.select(".chart").transition();
-
-        // Make the changes
-        // change the line facebook
-        svg.select("#fb")
-            .duration(750)
-            .style("opacity", 1)
-            .attr("d", valueline(data));
-
-        // change the line playstore
-        svg.select("#play")
-            .duration(750)
-            .style("opacity", 1)
-            .style("stroke", "red")
-            .attr("d", valueline_play(data));
-        // change the line appstore
-        svg.select("#appstore")
-            .duration(750)
-            .style("opacity", 1)
-            .style("stroke", "green")
-            .attr("d", valueline_appstore(data));
-
-        svg.selectAll(".fb-dot")
-            .duration(750)
-            .style("opacity", 1)
-            .attr("r", 3.5)
-            .attr("cx", function (d) {
-                return x(d.datetime);
-            })
-            .attr("cy", function (d) {
-                return y(d.fb);
-            })
-            .attr("value", function (d) {
-                return d.fb;
-            });
-
-        svg.select(".x.axis") // change the x axis
-            .duration(750)
-            .call(xAxis);
-        svg.select(".y.axis") // change the y axis
-            .duration(750)
-            .call(yAxis);
-
-    });
-}
-
 function showAllGraphs() {
     d3.json(url, function (error, data) {
         data.forEach(function (d) {
@@ -391,25 +321,25 @@ function showAllGraphs() {
         // change the line facebook
         svg.select("#fb")
             .duration(750)
-            .style("opacity", 1)
+            .style("display", "inline")
             .attr("d", valueline(data));
 
         // change the line playstore
         svg.select("#play")
             .duration(750)
-            .style("opacity", 1)
+            .style("display", "inline")
             .style("stroke", "red")
             .attr("d", valueline_play(data));
         // change the line appstore
         svg.select("#appstore")
             .duration(750)
-            .style("opacity", 1)
+            .style("display", "inline")
             .style("stroke", "green")
             .attr("d", valueline_appstore(data));
 
         svg.selectAll(".fb-dot")
             .duration(750)
-            .style("opacity", 1)
+            .style("display", "inline")
             .attr("r", 3.5)
             .attr("cx", function (d) {
                 return x(d.datetime);
@@ -419,6 +349,34 @@ function showAllGraphs() {
             })
             .attr("value", function (d) {
                 return d.fb;
+            });
+
+        svg.selectAll(".play-dot")
+            .duration(750)
+            .style("display", "inline")
+            .attr("r", 3.5)
+            .attr("cx", function (d) {
+                return x(d.datetime);
+            })
+            .attr("cy", function (d) {
+                return y1(d.play);
+            })
+            .attr("value", function (d) {
+                return d.play;
+            });
+
+        svg.selectAll(".appstore-dot")
+            .duration(750)
+            .style("display", "inline")
+            .attr("r", 3.5)
+            .attr("cx", function (d) {
+                return x(d.datetime);
+            })
+            .attr("cy", function (d) {
+                return y2(d.appstore);
+            })
+            .attr("value", function (d) {
+                return d.appstore;
             });
 
         svg.select(".x.axis") // change the x axis
@@ -460,35 +418,28 @@ function hideAllGraphs(){
         // change the line facebook
         svg.select("#fb")
             .duration(750)
-            .style("opacity", 1)
-            .attr("d", valueline(data));
+            .style("display", "none");
 
         // change the line playstore
         svg.select("#play")
             .duration(750)
-            .style("opacity", 1)
-            .style("stroke", "red")
-            .attr("d", valueline_play(data));
+            .style("display", "none");
         // change the line appstore
         svg.select("#appstore")
             .duration(750)
-            .style("opacity", 1)
-            .style("stroke", "green")
-            .attr("d", valueline_appstore(data));
+            .style("display", "none");
 
         svg.selectAll(".fb-dot")
             .duration(750)
-            .style("opacity", 1)
-            .attr("r", 3.5)
-            .attr("cx", function (d) {
-                return x(d.datetime);
-            })
-            .attr("cy", function (d) {
-                return y(d.fb);
-            })
-            .attr("value", function (d) {
-                return d.fb;
-            });
+            .style("display", "none");
+
+        svg.selectAll(".play-dot")
+            .duration(750)
+            .style("display", "none");
+
+        svg.selectAll(".appstore-dot")
+            .duration(750)
+            .style("display", "none");
 
         svg.select(".x.axis") // change the x axis
             .duration(750)
@@ -524,7 +475,19 @@ function showStoreGraph(store_id) {
         svg.select("#" + store_id)
             .duration(750)
             .style("display", "inline")
-            .attr("d", valueline(data));
+            .attr("d", function(){
+                switch(store_id){
+                    case "fb":
+                        return valueline(data);
+                        break;
+                    case "play":
+                        return valueline_play(data);
+                        break;
+                    case "appstore":
+                        return valueline_appstore(data);
+                        break;
+                }
+            });
         svg.selectAll("." + store_id + "-dot")
             .duration(750)
             .style("display", "inline");
@@ -578,7 +541,7 @@ function hideStoreGraph(store_id) {
     });
 }
 
-d3.select("#update").on("click", updateData);
+d3.select("#update").on("click", showAllGraphs);
 d3.select("#show-all").on("click", function () {
     if (this.checked) {
         showAllGraphs();
@@ -611,121 +574,3 @@ d3.select("#show-appstore").on("click", function () {
         hideStoreGraph(store_id);
     }
 });
-
-
-function showFacebookData() {
-    // Get the data again
-    d3.json("data.json", function (error, data) {
-        data.forEach(function (d) {
-            d.datetime = parseDate(d.datetime);
-            d.fb = +d.fb;
-        });
-
-        // Scale the range of the data again
-        x.domain(d3.extent(data, function (d) {
-            return d.datetime;
-        }));
-        y.domain([0, d3.max(data, function (d) {
-            return d.fb;
-        })]);
-
-        // Select the section we want to apply our changes to
-        var svg = d3.select(".chart").transition();
-
-        // Make the changes
-        // change the line facebook
-        svg.select("#fb")
-            .duration(750)
-            .style("display", "inline")
-            .attr("d", valuelineFB(data));
-        svg.selectAll(".fb-dot")
-            .duration(750)
-            .style("display", "inline");
-
-        svg.select(".x.axis") // change the x axis
-            .duration(750)
-            .call(xAxis);
-        svg.select(".y.axis") // change the y axis
-            .duration(750)
-            .call(yAxis);
-
-    });
-}
-
-function showPlaystoreData() {
-    // Get the data again
-    d3.json("data.json", function (error, data) {
-        data.forEach(function (d) {
-            d.datetime = parseDate(d.datetime);
-            d.play = +d.play;
-        });
-
-        // Scale the range of the data again
-        x.domain(d3.extent(data, function (d) {
-            return d.datetime;
-        }));
-        y.domain([0, d3.max(data, function (d) {
-            return d.play;
-        })]);
-
-        // Select the section we want to apply our changes to
-        var svg = d3.select(".chart").transition();
-
-        // Make the changes
-        // change the line facebook
-        svg.select("#playstore")
-            .duration(750)
-            .style("display", "inline")
-            .attr("d", valuelinePL(data));
-        svg.selectAll(".playstore-dot")
-            .duration(750)
-            .style("display", "inline");
-
-        svg.select(".x.axis") // change the x axis
-            .duration(750)
-            .call(xAxis);
-        svg.select(".y.axis") // change the y axis
-            .duration(750)
-            .call(yAxis);
-
-    });
-}
-
-function showAppstoreData() {
-    // Get the data again
-    d3.json("data.json", function (error, data) {
-        data.forEach(function (d) {
-            d.datetime = parseDate(d.datetime);
-            d.appstore = +d.appstore;
-        });
-
-        // Scale the range of the data again
-        x.domain(d3.extent(data, function (d) {
-            return d.datetime;
-        }));
-        y.domain([0, d3.max(data, function (d) {
-            return d.appstore;
-        })]);
-
-        // Select the section we want to apply our changes to
-        var svg = d3.select(".chart").transition();
-
-        // Make the changes
-        // change the line facebook
-        svg.select("#appstore")
-            .duration(750)
-            .style("display", "inline")
-            .attr("d", valuelineAP(data));
-        svg.selectAll(".appstore-dot")
-            .duration(750)
-            .style("display", "inline");
-
-        svg.select(".x.axis") // change the x axis
-            .duration(750)
-            .call(xAxis);
-        svg.select(".y.axis") // change the y axis
-            .duration(750)
-            .call(yAxis);
-
-    });
-}
