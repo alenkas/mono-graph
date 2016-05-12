@@ -1,6 +1,7 @@
 chart:
   ☐ on hover show tooltip forever on the right after the graph
   ☐ change buttons with select possibility to choose several graphs
+  ☐ input checkboxes work async
   ☐ ajax load
   ☐ on hover show lines to x and y axis
   ☐ add buttons to choose period on which to show graph (weeks, months, etc)

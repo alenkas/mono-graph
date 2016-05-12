@@ -118,7 +118,7 @@ d3.json(url, function (error, data) {
         .call(make_x_axis()
             .tickSize(-height, 0, 0)
             .tickFormat("")
-    );
+        );
 
     // Draw vertical lines
     svg.append("g")
@@ -126,7 +126,7 @@ d3.json(url, function (error, data) {
         .call(make_y_axis()
             .tickSize(-width, 0, 0)
             .tickFormat("")
-    );
+        );
 
     // Add the X Axis
     svg.append("g")
@@ -389,7 +389,7 @@ function showAllGraphs() {
     });
 }
 
-function hideAllGraphs(){
+function hideAllGraphs() {
     d3.json(url, function (error, data) {
         data.forEach(function (d) {
             d.datetime = parseDate(d.datetime);
@@ -475,8 +475,8 @@ function showStoreGraph(store_id) {
         svg.select("#" + store_id)
             .duration(750)
             .style("display", "inline")
-            .attr("d", function(){
-                switch(store_id){
+            .attr("d", function () {
+                switch (store_id) {
                     case "fb":
                         return valueline(data);
                         break;
@@ -542,35 +542,44 @@ function hideStoreGraph(store_id) {
 }
 
 d3.select("#update").on("click", showAllGraphs);
+d3.selectAll(".store-controls").on("click", function () {
+    var store_id = this.getAttribute("value");
+    var controls = document.getElementsByClassName("store-controls");
+    if (this.checked) {
+        showStoreGraph(store_id);
+    } else {
+        hideStoreGraph(store_id);
+    }
+    if (controls[1].checked && controls[3].checked && controls[3].checked) {
+        controls[0].checked = true;
+    } else {
+        controls[0].checked = false;
+    }
+
+});
 d3.select("#show-all").on("click", function () {
     if (this.checked) {
+        checkAll();
         showAllGraphs();
     } else {
+        uncheckAll();
         hideAllGraphs();
     }
 });
-d3.select("#show-facebook").on("click", function () {
-    var store_id = this.getAttribute("value");
-    if (this.checked) {
-        showStoreGraph(store_id);
-    } else {
-        hideStoreGraph(store_id);
-    }
-});
-d3.select("#show-playstore").on("click", function () {
-    var store_id = this.getAttribute("value");
-    if (this.checked) {
-        showStoreGraph(store_id);
-    } else {
-        hideStoreGraph(store_id);
-    }
-});
 
-d3.select("#show-appstore").on("click", function () {
-    var store_id = this.getAttribute("value");
-    if (this.checked) {
-        showStoreGraph(store_id);
-    } else {
-        hideStoreGraph(store_id);
+
+function checkAll() {
+    var controls = document.getElementsByClassName("store-controls");
+    for (var i = 0; i < controls.length; i++) {
+        controls[i].checked = true;
     }
-});
+}
+
+function uncheckAll() {
+    var controls = document.getElementsByClassName("store-controls");
+    for (var i = 0; i < controls.length; i++) {
+        controls[i].checked = false;
+    }
+}
+
+checkAll();
