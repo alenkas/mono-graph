@@ -1,7 +1,7 @@
 chart:
   ☐ on hover show tooltip forever on the right after the graph
-  ☐ change buttons with select possibility to choose several graphs
-  ☐ input checkboxes work async
+  ✔ change buttons with select possibility to choose several graphs @done (16-05-13 08:56)
+  ✔ input checkboxes work async @done (16-05-13 08:56)
   ☐ ajax load
   ☐ on hover show lines to x and y axis
   ☐ add buttons to choose period on which to show graph (weeks, months, etc)
@@ -12,7 +12,7 @@ axis:
 
 bugs:
   ☐ on update dots stay on their places
-  ☐ y axis shows incorrect highest number. it should show the highest number of all values in json
+  ✔ y axis shows incorrect highest number. it should show the highest number of all values in json @done (16-05-13 10:05)
   ☐ on update x axis moves
   ☐ on hover over first two dots difference between values is not calculated. it shows infinity or NaN.
 
