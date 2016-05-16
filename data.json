@@ -184,29 +184,4 @@
     "fb": 110,
     "play": 135,
     "appstore": 144
-}, {
-    "datetime": "2016-06-17",
-    "fb": 116,
-    "play": 137,
-    "appstore": 150
-}, {
-    "datetime": "2016-06-18",
-    "fb": 117,
-    "play": 141,
-    "appstore": 150
-}, {
-    "datetime": "2016-06-19",
-    "fb": 110,
-    "play": 135,
-    "appstore": 144
-}, {
-    "datetime": "2016-06-20",
-    "fb": 116,
-    "play": 137,
-    "appstore": 150
-}, {
-    "datetime": "2016-06-21",
-    "fb": 117,
-    "play": 141,
-    "appstore": 150
 }]

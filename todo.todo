@@ -3,7 +3,7 @@ chart:
   ✔ change buttons with select possibility to choose several graphs @done (16-05-13 08:56)
   ✔ input checkboxes work async @done (16-05-13 08:56)
   ☐ ajax load
-  ☐ on hover show lines to x and y axis
+  ✔ on hover show lines to x and y axis @done (16-05-16 13:08)
   ☐ add buttons to choose period on which to show graph (weeks, months, etc)
   ✔ on graph update also update last store values @done (16-05-13 13:39)
 
@@ -20,3 +20,4 @@ bugs:
 
 refactoring: 
   ✔ too many identical function. in that book there is a chapter in the end that says how to color different lines better @done (16-05-13 13:13)
+  ☐ showing circles and x line on hover works only for three lines, they are drawn not automatically

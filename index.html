@@ -35,7 +35,8 @@
         }
 
         #tooltip {
-            display: inline-block;
+            display: none;
+            position: absolute;
             width: 200px;
             height: auto;
             padding: 10px;
@@ -71,6 +72,15 @@
         #appstore .title {
             color: green;
         }
+        
+        #legend {
+            display: inline-block;
+            padding: 10px;
+            border: 1px solid #ccc;
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 4px;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -80,34 +90,37 @@
 <div>
     <svg class="chart"></svg>
     <div id="tooltip">
-        <div id="fb">
-            <p><span class="title">Facebook</span></p>
-
-            <p><strong class="date" data-store="fb">01.01.2017</strong> - <span class="value"
-                                                                                data-store="fb">100</span>
-                users</p>
-
-            <p><span class="difference" data-store="fb">20</span></p>
-        </div>
-        <div id="play">
-            <p><span class="title">Playstore</span></p>
-
-            <p><strong class="date" data-store="play">01.01.2017</strong> - <span class="value"
-                                                                                  data-store="play">100</span>
-                users</p>
-
-            <p><span class="difference" data-store="play">20</span></p>
-        </div>
-        <div id="appstore">
-            <p><span class="title">Appstore</span></p>
-
-            <p><strong class="date" data-store="appstore">01.01.2017</strong> - <span class="value"
-                                                                                      data-store="appstore">100</span>
-                users</p>
-
-            <p><span class="difference" data-store="appstore">20</span></p>
-        </div>
+        hello
     </div>
+    <!--<div id="tooltip">-->
+        <!--<div id="fb">-->
+            <!--<p><span class="title">Facebook</span></p>-->
+
+            <!--<p><strong class="date" data-store="fb">01.01.2017</strong> - <span class="value"-->
+                                                                                <!--data-store="fb">100</span>-->
+                <!--users</p>-->
+
+            <!--<p><span class="difference" data-store="fb">20</span></p>-->
+        <!--</div>-->
+        <!--<div id="play">-->
+            <!--<p><span class="title">Playstore</span></p>-->
+
+            <!--<p><strong class="date" data-store="play">01.01.2017</strong> - <span class="value"-->
+                                                                                  <!--data-store="play">100</span>-->
+                <!--users</p>-->
+
+            <!--<p><span class="difference" data-store="play">20</span></p>-->
+        <!--</div>-->
+        <!--<div id="appstore">-->
+            <!--<p><span class="title">Appstore</span></p>-->
+
+            <!--<p><strong class="date" data-store="appstore">01.01.2017</strong> - <span class="value"-->
+                                                                                      <!--data-store="appstore">100</span>-->
+                <!--users</p>-->
+
+            <!--<p><span class="difference" data-store="appstore">20</span></p>-->
+        <!--</div>-->
+    <!--</div>-->
     <div id="controls">
         <button id="update">update</button>
         <button id="week">week</button>
