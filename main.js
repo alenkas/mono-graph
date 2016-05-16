@@ -50,7 +50,8 @@ var svg = d3.select(".chart")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var tooltip = d3.select("#tooltip");
+var tooltip = d3.select("#tooltip")
+    .style("display", "none");
 
 function make_x_axis() {
     return d3.svg.axis()
@@ -350,12 +351,24 @@ d3.json(url, function (error, data) {
         .style("fill", "none")
         .style("pointer-events", "all")
         .on("mouseover", function () {
+            tooltip.style("display", null);
             focus.style("display", null);
         })
         .on("mouseout", function () {
+            tooltip.style("display", "none")
             focus.style("display", "none");
         })
         .on("mousemove", mousemove);
+
+    //var store_tooltip = tooltip.selectAll(".store")
+    //    .data(stores)
+    //    .enter().append("div")
+    //    .attr("class", "store");
+
+    //store_tooltip.select(".name")
+    //    .data(stores)
+    //    .enter().append("strong")
+    //    .attr("class", "name");
 
     function mousemove() {
         var x0 = x.invert(d3.mouse(this)[0]),
@@ -365,43 +378,46 @@ d3.json(url, function (error, data) {
             d = x0 - d0.datetime > d1.datetime - x0 ? d1 : d0;
 
         focus.select("circle.fb")
+            .attr("value", d.fb)
             .attr("transform",
             "translate(" + x(d.datetime) + "," +
             y(d.fb) + ")");
 
         focus.select("circle.play")
+            .attr("value", d.play)
             .attr("transform",
             "translate(" + x(d.datetime) + "," +
             y(d.play) + ")");
 
         focus.select("circle.appstore")
+            .attr("value", d.appstore)
             .attr("transform",
             "translate(" + x(d.datetime) + "," +
             y(d.appstore) + ")");
 
-        focus.select("text.y1")
-            .attr("transform",
-            "translate(" + x(d.datetime) + "," +
-            y(d.play) + ")")
-            .text(d.play);
-
-        focus.select("text.y2")
-            .attr("transform",
-            "translate(" + x(d.datetime) + "," +
-            y(d.play) + ")")
-            .text(d.play);
-
-        focus.select("text.y3")
-            .attr("transform",
-            "translate(" + x(d.datetime) + "," +
-            y(d.play) + ")")
-            .text(formatDate(d.datetime));
-
-        focus.select("text.y4")
-            .attr("transform",
-            "translate(" + x(d.datetime) + "," +
-            y(d.play) + ")")
-            .text(formatDate(d.datetime));
+        //focus.select("text.y1")
+        //    .attr("transform",
+        //    "translate(" + x(d.datetime) + "," +
+        //    y(d.play) + ")")
+        //    .text(d.play);
+        //
+        //focus.select("text.y2")
+        //    .attr("transform",
+        //    "translate(" + x(d.datetime) + "," +
+        //    y(d.play) + ")")
+        //    .text(d.play);
+        //
+        //focus.select("text.y3")
+        //    .attr("transform",
+        //    "translate(" + x(d.datetime) + "," +
+        //    y(d.play) + ")")
+        //    .text(formatDate(d.datetime));
+        //
+        //focus.select("text.y4")
+        //    .attr("transform",
+        //    "translate(" + x(d.datetime) + "," +
+        //    y(d.play) + ")")
+        //    .text(formatDate(d.datetime));
 
         focus.select(".x")
             .attr("transform",
@@ -417,6 +433,43 @@ d3.json(url, function (error, data) {
 
         tooltip.style("left", d3.event.pageX + "px")
             .style("top", d3.event.pageY + "px");
+
+        tooltip.select(".fb")
+            .data(stores)
+            .select(".store")
+            .text(function(d){
+                return "fb";
+            });
+        tooltip.select(".fb")
+            .select(".value")
+            .text(function(){
+                var value = d3.select("circle.fb").attr("value");
+                return value;
+            });
+        tooltip.select(".play")
+            .data(stores)
+            .select(".store")
+            .text(function(d){
+                return "play";
+            });
+        tooltip.select(".play")
+            .select(".value")
+            .text(function(){
+                var value = d3.select("circle.play").attr("value");
+                return value;
+            });
+        tooltip.select(".appstore")
+            .data(stores)
+            .select(".store")
+            .text(function(d){
+                return "appstore";
+            });
+        tooltip.select(".appstore")
+            .select(".value")
+            .text(function(){
+                var value = d3.select("circle.appstore").attr("value");
+                return value;
+            });
     }
 
     d3.selectAll(".date")
@@ -657,10 +710,11 @@ function update_graphs() {
             .style("fill", "none")
             .style("pointer-events", "all")
             .on("mouseover", function () {
-                console.log("hey hey");
+                tooltip.style("display", null);
                 focus.style("display", null);
             })
             .on("mouseout", function () {
+                tooltip.style("display", "none");
                 focus.style("display", "none");
             })
             .on("mousemove", mousemove);
@@ -687,29 +741,29 @@ function update_graphs() {
                 "translate(" + x(d.datetime) + "," +
                 y(d.appstore) + ")");
 
-            focus.select("text.y1")
-                .attr("transform",
-                "translate(" + x(d.datetime) + "," +
-                y(d.play) + ")")
-                .text(d.play);
-
-            focus.select("text.y2")
-                .attr("transform",
-                "translate(" + x(d.datetime) + "," +
-                y(d.play) + ")")
-                .text(d.play);
-
-            focus.select("text.y3")
-                .attr("transform",
-                "translate(" + x(d.datetime) + "," +
-                y(d.play) + ")")
-                .text(formatDate(d.datetime));
-
-            focus.select("text.y4")
-                .attr("transform",
-                "translate(" + x(d.datetime) + "," +
-                y(d.play) + ")")
-                .text(formatDate(d.datetime));
+            //focus.select("text.y1")
+            //    .attr("transform",
+            //    "translate(" + x(d.datetime) + "," +
+            //    y(d.play) + ")")
+            //    .text(d.play);
+            //
+            //focus.select("text.y2")
+            //    .attr("transform",
+            //    "translate(" + x(d.datetime) + "," +
+            //    y(d.play) + ")")
+            //    .text(d.play);
+            //
+            //focus.select("text.y3")
+            //    .attr("transform",
+            //    "translate(" + x(d.datetime) + "," +
+            //    y(d.play) + ")")
+            //    .text(formatDate(d.datetime));
+            //
+            //focus.select("text.y4")
+            //    .attr("transform",
+            //    "translate(" + x(d.datetime) + "," +
+            //    y(d.play) + ")")
+            //    .text(formatDate(d.datetime));
 
             focus.select(".x")
                 .attr("transform",
@@ -722,6 +776,46 @@ function update_graphs() {
                 "translate(" + width * -1 + "," +
                 y(d.play) + ")")
                 .attr("x2", width + width);
+
+            tooltip.style("left", d3.event.pageX + "px")
+                .style("top", d3.event.pageY + "px");
+
+            tooltip.select(".fb")
+                .data(stores)
+                .select(".store")
+                .text(function(d){
+                    return "fb";
+                });
+            tooltip.select(".fb")
+                .select(".value")
+                .text(function(){
+                    var value = d3.select("circle.fb").attr("value");
+                    return value;
+                });
+            tooltip.select(".play")
+                .data(stores)
+                .select(".store")
+                .text(function(d){
+                    return "play";
+                });
+            tooltip.select(".play")
+                .select(".value")
+                .text(function(){
+                    var value = d3.select("circle.play").attr("value");
+                    return value;
+                });
+            tooltip.select(".appstore")
+                .data(stores)
+                .select(".store")
+                .text(function(d){
+                    return "appstore";
+                });
+            tooltip.select(".appstore")
+                .select(".value")
+                .text(function(){
+                    var value = d3.select("circle.appstore").attr("value");
+                    return value;
+                });
 
         }
 
@@ -819,7 +913,7 @@ function show_all_graphs() {
         .style("display", "inline");
 
     focus.selectAll("circle")
-        .style("display", "block");
+        .style("display", null);
 
     // Make the changes
     // change the line facebook
@@ -896,6 +990,9 @@ function hide_all_graphs() {
         .style("display", "none");
     store.selectAll("circle")
         .style("display", "none");
+
+    focus.selectAll("circle")
+        .style("display", "none");
 }
 
 function show_store_graph(store_id) {
@@ -961,7 +1058,7 @@ function show_store_graph(store_id) {
             .style("display", "inline");
 
         focus.select("circle." + store_id)
-            .style("display", "block");
+            .style("display", null);
 
 
         //svg.select(".x.axis") // change the x axis

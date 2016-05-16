@@ -35,7 +35,6 @@
         }
 
         #tooltip {
-            display: none;
             position: absolute;
             width: 200px;
             height: auto;
@@ -82,15 +81,42 @@
             border-radius: 4px;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 </head>
 
 <body>
 <div>
+    <div id="controls">
+        <button id="update">update</button>
+        <button id="week">week</button>
+        <button id="month">month</button>
+        <div>
+            <input id="show-all" class="store-controls" type="checkbox" value="all"/><label for="show-all">Check/uncheck
+            all</label><br/>
+            <input id="show-facebook" class="store-controls" type="checkbox" value="fb"/><label for="show-facebook">Facebook</label>
+            <br/>
+            <input id="show-playstore" class="store-controls" type="checkbox" value="play"/><label
+                for="show-playstore">Playstore</label> <br/>
+            <input id="show-appstore" class="store-controls" type="checkbox" value="appstore"/><label
+                for="show-appstore">Appstore</label>
+        </div>
+    </div>
     <svg class="chart"></svg>
     <div id="tooltip">
-        hello
+        <div class="fb">
+            <strong class="store"></strong>
+            <span class="value"></span>
+        </div>
+        <div class="play">
+            <strong class="store"></strong>
+            <span class="value"></span>
+        </div>
+        <div class="appstore">
+            <strong class="store"></strong>
+            <span class="value"></span>
+        </div>
     </div>
     <!--<div id="tooltip">-->
         <!--<div id="fb">-->
@@ -121,21 +147,6 @@
             <!--<p><span class="difference" data-store="appstore">20</span></p>-->
         <!--</div>-->
     <!--</div>-->
-    <div id="controls">
-        <button id="update">update</button>
-        <button id="week">week</button>
-        <button id="month">month</button>
-        <div>
-            <input id="show-all" class="store-controls" type="checkbox" value="all"/><label for="show-all">Check/uncheck
-            all</label><br/>
-            <input id="show-facebook" class="store-controls" type="checkbox" value="fb"/><label for="show-facebook">Facebook</label>
-            <br/>
-            <input id="show-playstore" class="store-controls" type="checkbox" value="play"/><label
-                for="show-playstore">Playstore</label> <br/>
-            <input id="show-appstore" class="store-controls" type="checkbox" value="appstore"/><label
-                for="show-appstore">Appstore</label>
-        </div>
-    </div>
 </div>
 <script src="main.js"></script>
 </body>
