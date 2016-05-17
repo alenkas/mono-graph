@@ -8,6 +8,14 @@ var margin = {
     width = 950 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
+var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function get_month(month_number){
+    switch(month_number){
+        case month_number:
+            return months[month_number];
+    }
+}
+
 var data;
 
 var yTranslate = 0;
@@ -52,8 +60,8 @@ var svg = d3.select(".chart")
 
 var tooltip = d3.select("#tooltip")
     .style("left", margin.left * 1.6 + "px")
-    .style("top", margin.top * 2.2 + "px");
-    //.style("display", "none");
+    .style("top", margin.top * 2.2 + "px")
+    .style("display", "none");
 
 function make_x_axis() {
     return d3.svg.axis()
@@ -69,6 +77,7 @@ function make_y_axis() {
         .ticks(5);
 }
 
+//not sure if it's used
 //var lineSvg = svg.append("g");
 
 var focus = svg.append("g")
@@ -207,95 +216,7 @@ d3.json(url, function (error, data) {
             return d.name;
         });
 
-    //mouseG.append("path") // this is the black vertical line to follow mouse
-    //    .attr("class", "mouse-line")
-    //    .style("stroke", "black")
-    //    .style("stroke-width", "1px")
-    //    .style("opacity", "0");
-    //
-    //var lines = document.getElementsByClassName('line');
-    //
-    //var mousePerLine = mouseG.selectAll('.mouse-per-line')
-    //    .data(stores)
-    //    .enter()
-    //    .append("g")
-    //    .attr("class", "mouse-per-line");
-    //
-    //mousePerLine.append("circle")
-    //    .attr("r", 7)
-    //    .style("stroke", function(d) {
-    //        return color(d.name);
-    //    })
-    //    .style("fill", "none")
-    //    .style("stroke-width", "1px")
-    //    .style("opacity", "0");
-    //
-    //mousePerLine.append("text")
-    //    .attr("transform", "translate(10,3)");
-    //
-    //mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
-    //    .attr('width', width) // can't catch mouse events on a g element
-    //    .attr('height', height)
-    //    .attr('fill', 'none')
-    //    .attr('pointer-events', 'all')
-    //    .on('mouseout', function() { // on mouse out hide line, circles and text
-    //        d3.select(".mouse-line")
-    //            .style("opacity", "0");
-    //        d3.selectAll(".mouse-per-line circle")
-    //            .style("opacity", "0");
-    //        d3.selectAll(".mouse-per-line text")
-    //            .style("opacity", "0");
-    //    })
-    //    .on('mouseover', function() { // on mouse in show line, circles and text
-    //        d3.select(".mouse-line")
-    //            .style("opacity", "1");
-    //        d3.selectAll(".mouse-per-line circle")
-    //            .style("opacity", "1");
-    //        d3.selectAll(".mouse-per-line text")
-    //            .style("opacity", "1");
-    //    })
-    //    .on('mousemove', function() { // mouse moving over canvas
-    //        var mouse = d3.mouse(this);
-    //        d3.select(".mouse-line")
-    //            .attr("d", function() {
-    //                var d = "M" + mouse[0] + "," + height;
-    //                d += " " + mouse[0] + "," + 0;
-    //                return d;
-    //            });
-    //
-    //        d3.selectAll(".mouse-per-line")
-    //            .attr("transform", function(d, i) {
-    //                console.log(width/mouse[0]);
-    //                var xDate = x.invert(mouse[0]),
-    //                    bisect = d3.bisector(function(d) { return d.date; }).right;
-    //                idx = bisect(d.values, xDate);
-    //
-    //                var beginning = 0,
-    //                    end = lines[i].getTotalLength(),
-    //                    target = null;
-    //
-    //                while (true){
-    //                    target = Math.floor((beginning + end) / 2);
-    //                    pos = lines[i].getPointAtLength(target);
-    //                    if ((target === end || target === beginning) && pos.x !== mouse[0]) {
-    //                        break;
-    //                    }
-    //                    if (pos.x > mouse[0])      end = target;
-    //                    else if (pos.x < mouse[0]) beginning = target;
-    //                    else break; //position found
-    //                }
-    //
-    //                //d3.select(this).select('text')
-    //                //    .text(y.invert(pos.y).toFixed(2));
-    //
-    //                tooltip.select("#" + d.name)
-    //                    ;
-    //                console.log(d.name);
-    //
-    //                return "translate(" + mouse[0] + "," + pos.y +")";
-    //            });
-    //    });
-
+    // don't know what's this for
     // Add the valueline path.
     //lineSvg.append("path")
     //    .attr("class", "line")
@@ -312,18 +233,6 @@ d3.json(url, function (error, data) {
         .style("opacity", 0.5)
         .attr("y1", 0)
         .attr("y2", height);
-
-    //// append the y line
-    //focus.append("line")
-    //    .data(stores)
-    //    .attr("class", "y")
-    //    .style("stroke", function(d){
-    //        return color(d.name);
-    //    })
-    //    .style("stroke-dasharray", "3,3")
-    //    .style("opacity", 0.5)
-    //    .attr("x1", width)
-    //    .attr("x2", width);
 
     // append the circle at the intersection
     focus.selectAll("circle")
@@ -380,12 +289,12 @@ d3.json(url, function (error, data) {
         .text(function(d){
             return d.name;
         });
-    tooltip_section.append("div")
-        .attr("class", "tooltip-value")
-        .text(function(d){
-            console.log(d.values[d.values.length - 1].store);
-            return d.values[d.values.length - 1].store;
-        });
+    //not sure if it's needed
+    //tooltip_section.append("div")
+    //    .attr("class", "tooltip-value")
+    //    .text(function(d){
+    //        return d.values[d.values.length - 1].store;
+    //    });
 
     function mousemove() {
         var x0 = x.invert(d3.mouse(this)[0]),
@@ -450,81 +359,6 @@ d3.json(url, function (error, data) {
             });
     }
 });
-
-var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-function get_month(month_number){
-    switch(month_number){
-        case month_number:
-            return months[month_number];
-    }
-    //return ;
-}
-
-function store_data(d, store_id) {
-    switch (store_id) {
-        case "fb":
-            return d.fb;
-            break;
-        case "play":
-            return d.play;
-            break;
-        case "appstore":
-            return d.appstore;
-            break;
-    }
-}
-
-function mouseover(d) {
-    var element = this;
-    console.log(this);
-    var store_id = element.getAttribute("data-store");
-    //tooltip.style("left", d3.event.pageX + "px")
-    //     .style("top", d3.event.pageY + "px");
-    tooltip.select("#" + store_id).select(".date")
-        .transition()
-        .duration(150)
-        .style("color", "red")
-        .text(function () {
-            var date = d.datetime;
-            return date.getDate() + "." + (date.getMonth() + 1) + "." + (date.getFullYear() + 1);
-        })
-        .transition()
-        .duration(450)
-        .style("color", "black");
-    tooltip.select("#" + store_id).select(".value")
-        .transition()
-        .duration(150)
-        .style("color", "red")
-        .text(function () {
-            return store_data(d, store_id);
-        })
-        .transition()
-        .duration(450)
-        .style("color", "black");
-    tooltip.select("#" + store_id).select(".difference")
-        .transition()
-        .duration(150)
-        .style("color", "red")
-        .text(function () {
-            var previousValue = element.previousSibling.getAttribute("value");
-            var currentValue = element.getAttribute("value");
-
-            switch (previousValue) {
-                case null:
-                    return "beginning of period";
-                    break;
-                case "0":
-                    return "-";
-                    break;
-                default:
-                    return Math.floor((((currentValue - previousValue) / previousValue) * 100) * 100) / 100 + "%";
-                    break;
-            }
-        })
-        .transition()
-        .duration(450)
-        .style("color", "black");
-}
 
 function update_graphs() {
     d3.json("data1.json", function (error, data) {
@@ -680,50 +514,32 @@ function update_graphs() {
     });
 }
 
-function show_all_graphs() {
-    // Select the section we want to apply our changes to
-    var svg = d3.select(".chart");
-
-    svg.selectAll(".store")
-        .style("display", null);
-
-    focus.selectAll("circle")
-        .style("display", null);
-}
-
-function hide_all_graphs() {
+function select_store_graph(store_id) {
     // Select the section we want to apply our changes to
     var svg = d3.select(".chart").transition();
 
-    svg.selectAll(".store")
-        .style("display", "none");
+    svg.selectAll(".store").filter(function(d){
+        d3.select(this)
+            .style("display", "none");
+        svg.select("#" + store_id)
+            .style("display", null);
+    });
 
-    focus.selectAll("circle")
-        .style("display", "none");
-}
-
-function show_store_graph(store_id) {
-    // Select the section we want to apply our changes to
-    var svg = d3.select(".chart").transition();
-
-    // Show selected store
-    svg.select("#" + store_id)
-        .duration(750)
-        .style("display", null);
 
     focus.select("circle." + store_id)
         .style("display", null);
 }
 
-function hide_store_graph(store_id) {
+function deselect_store_graph(store_id) {
 
     // Select the section we want to apply our changes to
     var svg = d3.select(".chart").transition();
 
-    // Hide chosen store
-    svg.select("#" + store_id)
-        .duration(750)
-        .style("display", "none");
+    svg.selectAll(".store").filter(function(d){
+        d3.select(this)
+            .style("display", null);
+    });
+
     focus.select("circle." + store_id)
         .style("display", "none");
 
@@ -737,154 +553,11 @@ window.onload = function(){
     d3.selectAll(".legend-text").on("click", function () {
         var store_id = this.getAttribute("data-store");
         if (clicked) {
-            show_store_graph(store_id);
+            select_store_graph(store_id);
             clicked = false;
         } else {
-            hide_store_graph(store_id);
+            deselect_store_graph(store_id);
             clicked = true;
         }
     });
 };
-
-d3.select("#show-all").on("click", function () {
-    if (this.checked) {
-        check_all();
-        show_all_graphs();
-    } else {
-        uncheck_all();
-        hide_all_graphs();
-    }
-});
-//d3.select("#week").on("click", function () {
-//
-//    //Define the axes
-//    var xAxis = d3.svg.axis().scale(x)
-//        .orient("bottom").ticks(d3.time.days, 1).tickFormat(d3.time.format("%d %b"));
-//
-//    var yAxis = d3.svg.axis().scale(y)
-//        .orient("left").ticks(5);
-//
-//    d3.json(url, function (error, data) {
-//
-//        color.domain(d3.keys(data[0]).filter(function (key) {
-//            return key !== "datetime";
-//        }));
-//
-//        data.forEach(function (d) {
-//            d.datetime = parseDate(d.datetime);
-//        });
-//
-//        var stores = color.domain().map(function (name) {
-//            return {
-//                name: name,
-//                values: data.map(function (d) {
-//                    return {datetime: d.datetime, store: +d[name]};
-//                })
-//            };
-//        });
-//
-//
-//        // Scale the range of the data again
-//        x.domain(d3.extent(data, function (d) {
-//            return d.datetime;
-//        }));
-//        y.domain([
-//            d3.min(stores, function (c) {
-//                return d3.min(c.values, function (v) {
-//                    return v.store;
-//                });
-//            }),
-//            d3.max(stores, function (c) {
-//                return d3.max(c.values, function (v) {
-//                    return v.store;
-//                });
-//            })
-//        ]);
-//        //
-//        // Select the section we want to apply our changes to
-//        var svg = d3.select(".chart");
-//
-//        var store = svg.selectAll(".store")
-//            .data(stores);
-//
-//        store.select("path")
-//            .transition()
-//            .duration(750)
-//            .attr("d", function (d) {
-//                return valueline(d.values);
-//            })
-//            .style("display", "inline");
-//
-//        store.selectAll(".fb-dot")
-//            .data(data)
-//            .transition()
-//            .duration(750)
-//            .attr("r", 3.5)
-//            .attr("cx", function (d) {
-//                return x(d.datetime);
-//            })
-//            .attr("cy", function (d) {
-//                return y(d.fb);
-//            })
-//            .attr("value", function (d) {
-//                return d.fb;
-//            });
-//
-//
-//        d3.selectAll(".date")
-//            .data(data)
-//            .text(function (d) {
-//                var lastArrayItem = data[data.length - 1];
-//                var date = lastArrayItem.datetime;
-//                return date.getDate() + "." + (date.getMonth() + 1) + "." + (date.getFullYear() + 1);
-//            });
-//        d3.selectAll(".value")
-//            .data(data)
-//            .text(function (d) {
-//                var lastArrayItem = data[data.length - 1];
-//                var store_id = this.getAttribute("data-store");
-//                return store_data(lastArrayItem, store_id);
-//            });
-//        d3.selectAll(".difference")
-//            .data(data)
-//            .text(function (d) {
-//                var lastArrayItem = data[data.length - 1];
-//                var store_id = this.getAttribute("data-store");
-//                return store_data(lastArrayItem, store_id) + "%";
-//            });
-//
-//        // update the x axis
-//        svg.select(".x.axis")
-//            //.duration(750)
-//            .attr("class", "x axis")
-//            .attr("transform", "translate(0," + height + ")")
-//            .call(xAxis)
-//            .selectAll("text")
-//            .style("text-anchor", "end")
-//            .attr("dx", "-.8em")
-//            .attr("dy", ".15em")
-//            .attr("transform", "rotate(-45)");
-//
-//        // update the y axis
-//        svg.select(".y.axis")
-//            //.duration(750)
-//            .call(yAxis);
-//    })
-//});
-
-
-//function check_all() {
-//    var controls = document.getElementsByClassName("store-controls");
-//    for (var i = 0; i < controls.length; i++) {
-//        controls[i].checked = true;
-//    }
-//}
-//
-//function uncheck_all() {
-//    var controls = document.getElementsByClassName("store-controls");
-//    for (var i = 0; i < controls.length; i++) {
-//        controls[i].checked = false;
-//    }
-//}
-//
-//check_all();
