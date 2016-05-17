@@ -36,16 +36,14 @@
 
         #tooltip {
             position: absolute;
-            width: 200px;
+            width: auto;
             height: auto;
             padding: 10px;
-            background-color: white;
-            -webkit-border-radius: 10px;
-            -moz-border-radius: 10px;
-            border-radius: 10px;
-            -webkit-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-            -moz-box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
-            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.4);
+            background-color: rgba(255, 255, 255, 0.5);
+            border: 1px solid #ccc;
+            -webkit-box-shadow: 4px 4px 4px -3px rgba(0, 0, 0, 0.4);
+            -moz-box-shadow: 4px 4px 4px -3px rgba(0, 0, 0, 0.4);
+            box-shadow: 4px 4px 4px -3px rgba(0, 0, 0, 0.4);
             pointer-events: none;
         }
 
@@ -57,7 +55,7 @@
         }
 
         #controls {
-            display: inline-block;
+            /*display: inline-block;*/
         }
 
         #fb .title {
@@ -80,9 +78,25 @@
             -moz-border-radius: 4px;
             border-radius: 4px;
         }
+
+        #tooltip .tooltip-section div {
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        #tooltip .tooltip-section .tooltip-swatch {
+            width: 10px;
+            height: 10px;
+        }
+
+        #tooltip .tooltip-section .tooltip-title {
+            width: 90px;
+        }
+
+        #tooltip .tooltip-section .tooltip-value {
+            width: 20px;
+        }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 </head>
 
@@ -92,61 +106,19 @@
         <button id="update">update</button>
         <button id="week">week</button>
         <button id="month">month</button>
-        <div>
-            <input id="show-all" class="store-controls" type="checkbox" value="all"/><label for="show-all">Check/uncheck
-            all</label><br/>
-            <input id="show-facebook" class="store-controls" type="checkbox" value="fb"/><label for="show-facebook">Facebook</label>
-            <br/>
-            <input id="show-playstore" class="store-controls" type="checkbox" value="play"/><label
-                for="show-playstore">Playstore</label> <br/>
-            <input id="show-appstore" class="store-controls" type="checkbox" value="appstore"/><label
-                for="show-appstore">Appstore</label>
-        </div>
+        <!--<div>-->
+            <!--<input id="show-all" class="store-controls" type="checkbox" value="all"/><label for="show-all">Check/uncheck-->
+            <!--all</label><br/>-->
+            <!--<input id="show-facebook" class="store-controls" type="checkbox" value="fb"/><label for="show-facebook">Facebook</label>-->
+            <!--<br/>-->
+            <!--<input id="show-playstore" class="store-controls" type="checkbox" value="play"/><label-->
+                <!--for="show-playstore">Playstore</label> <br/>-->
+            <!--<input id="show-appstore" class="store-controls" type="checkbox" value="appstore"/><label-->
+                <!--for="show-appstore">Appstore</label>-->
+        <!--</div>-->
     </div>
     <svg class="chart"></svg>
-    <div id="tooltip">
-        <div class="fb">
-            <strong class="store"></strong>
-            <span class="value"></span>
-        </div>
-        <div class="play">
-            <strong class="store"></strong>
-            <span class="value"></span>
-        </div>
-        <div class="appstore">
-            <strong class="store"></strong>
-            <span class="value"></span>
-        </div>
-    </div>
-    <!--<div id="tooltip">-->
-        <!--<div id="fb">-->
-            <!--<p><span class="title">Facebook</span></p>-->
-
-            <!--<p><strong class="date" data-store="fb">01.01.2017</strong> - <span class="value"-->
-                                                                                <!--data-store="fb">100</span>-->
-                <!--users</p>-->
-
-            <!--<p><span class="difference" data-store="fb">20</span></p>-->
-        <!--</div>-->
-        <!--<div id="play">-->
-            <!--<p><span class="title">Playstore</span></p>-->
-
-            <!--<p><strong class="date" data-store="play">01.01.2017</strong> - <span class="value"-->
-                                                                                  <!--data-store="play">100</span>-->
-                <!--users</p>-->
-
-            <!--<p><span class="difference" data-store="play">20</span></p>-->
-        <!--</div>-->
-        <!--<div id="appstore">-->
-            <!--<p><span class="title">Appstore</span></p>-->
-
-            <!--<p><strong class="date" data-store="appstore">01.01.2017</strong> - <span class="value"-->
-                                                                                      <!--data-store="appstore">100</span>-->
-                <!--users</p>-->
-
-            <!--<p><span class="difference" data-store="appstore">20</span></p>-->
-        <!--</div>-->
-    <!--</div>-->
+    <div id="tooltip"></div>
 </div>
 <script src="main.js"></script>
 </body>

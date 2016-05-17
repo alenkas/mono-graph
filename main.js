@@ -19,7 +19,7 @@ var parseDate = d3.time.format("%Y-%m-%d").parse,
     formatDate = d3.time.format("%d-%b"),
     bisectDate = d3.bisector(function (d) {
         return d.datetime;
-    }).left
+    }).left;
 
 var x = d3.time.scale().range([0, width]);
 var y = d3.scale.linear()
@@ -51,7 +51,9 @@ var svg = d3.select(".chart")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var tooltip = d3.select("#tooltip")
-    .style("display", "none");
+    .style("left", margin.left * 1.6 + "px")
+    .style("top", margin.top * 2.2 + "px");
+    //.style("display", "none");
 
 function make_x_axis() {
     return d3.svg.axis()
@@ -67,11 +69,10 @@ function make_y_axis() {
         .ticks(5);
 }
 
-var lineSvg = svg.append("g");
+//var lineSvg = svg.append("g");
 
 var focus = svg.append("g")
     .attr("class", "hover");
-//.style("display", "none");
 
 d3.json(url, function (error, data) {
 
@@ -113,7 +114,7 @@ d3.json(url, function (error, data) {
 
     // Draw horizontal lines
     svg.append("g")
-        .attr("class", "grid")
+        .attr("class", "x grid")
         .attr("transform", "translate(0," + height + ")")
         .call(make_x_axis()
             .tickSize(-height, 0, 0)
@@ -122,7 +123,7 @@ d3.json(url, function (error, data) {
 
     // Draw vertical lines
     svg.append("g")
-        .attr("class", "grid")
+        .attr("class", "y grid")
         .call(make_y_axis()
             .tickSize(-width, 0, 0)
             .tickFormat("")
@@ -161,19 +162,6 @@ d3.json(url, function (error, data) {
             return color(d.name);
         });
 
-    //store.append("text")
-    //    .datum(function (d) {
-    //        return {name: d.name, value: d.values[d.values.length - 1]};
-    //    })
-    //    .attr("transform", function (d) {
-    //        return "translate(" + x(d.value.datetime) + "," + y(d.value.store) + ")";
-    //    })
-    //    .attr("x", 3)
-    //    .attr("dy", ".35em")
-    //    .text(function (d) {
-    //        return d.name;
-    //    });
-
     var legend = svg.append("g")
         .attr("transform", "translate(" + (width + margin.left) + ",0)");
 
@@ -184,25 +172,33 @@ d3.json(url, function (error, data) {
         .attr("width", width / 4)
         .attr("height", height / 4);
 
-    legend.selectAll(".legend")
+    var legend_group = legend.selectAll("g")
         .data(stores)
-        .enter().append("rect")
-        .attr("style", "legend")
+        .enter().append("g")
+        .attr("class", "legend");
+
+    legend_group.append("rect")
+        .attr("class", "rect")
         .attr("width", 10)
         .attr("height", 10)
-        .style("fill", function(d){
+        .attr("id", function (d) {
+            return d.name + "1";
+        })
+        .style("fill", function (d) {
             return color(d.name);
         })
-        .attr("transform", function(d){
+        .attr("transform", function (d) {
             yTranslate += 20;
             return "translate(20, " + yTranslate + ")";
         });
 
     yTranslate = 10;
 
-    legend.selectAll("text")
-        .data(stores)
-        .enter().append("text")
+    legend_group.append("text")
+        .attr("class", "legend-text")
+        .attr("data-store", function(d){
+            return d.name;
+        })
         .attr("transform", function () {
             yTranslate += 20;
             return "translate(40, " + yTranslate + ")";
@@ -360,15 +356,36 @@ d3.json(url, function (error, data) {
         })
         .on("mousemove", mousemove);
 
-    //var store_tooltip = tooltip.selectAll(".store")
-    //    .data(stores)
-    //    .enter().append("div")
-    //    .attr("class", "store");
+    tooltip.append("div")
+        .attr("id", "tooltip-title")
+        .style("font-weight", "bold")
+        .text("Stores");
 
-    //store_tooltip.select(".name")
-    //    .data(stores)
-    //    .enter().append("strong")
-    //    .attr("class", "name");
+    var tooltip_section = tooltip.selectAll(".store")
+        .data(stores)
+        .enter().append("div")
+        .attr("class", "tooltip-section");
+
+    tooltip_section.append("div")
+        .attr("class", "tooltip-swatch")
+        .style("background-color", function(d){
+            return color(d.name);
+        });
+
+    tooltip_section.append("div")
+        .attr("class", "tooltip-title")
+        .attr("title", function(d){
+            return d.name;
+        })
+        .text(function(d){
+            return d.name;
+        });
+    tooltip_section.append("div")
+        .attr("class", "tooltip-value")
+        .text(function(d){
+            console.log(d.values[d.values.length - 1].store);
+            return d.values[d.values.length - 1].store;
+        });
 
     function mousemove() {
         var x0 = x.invert(d3.mouse(this)[0]),
@@ -376,6 +393,17 @@ d3.json(url, function (error, data) {
             d0 = data[i - 1],
             d1 = data[i],
             d = x0 - d0.datetime > d1.datetime - x0 ? d1 : d0;
+
+        //focus.selectAll("circle")
+        //    .data(stores)
+        //    .attr("value", function(d){
+        //        return d.name;
+        //    })
+        //    .attr("transform", function(d){
+        //        console.log(d.values, d.name, d);
+        //        return  "translate(" + x(d.datetime) + "," +
+        //            y(d.name) + ")";
+        //    });
 
         focus.select("circle.fb")
             .attr("value", d.fb)
@@ -395,30 +423,6 @@ d3.json(url, function (error, data) {
             "translate(" + x(d.datetime) + "," +
             y(d.appstore) + ")");
 
-        //focus.select("text.y1")
-        //    .attr("transform",
-        //    "translate(" + x(d.datetime) + "," +
-        //    y(d.play) + ")")
-        //    .text(d.play);
-        //
-        //focus.select("text.y2")
-        //    .attr("transform",
-        //    "translate(" + x(d.datetime) + "," +
-        //    y(d.play) + ")")
-        //    .text(d.play);
-        //
-        //focus.select("text.y3")
-        //    .attr("transform",
-        //    "translate(" + x(d.datetime) + "," +
-        //    y(d.play) + ")")
-        //    .text(formatDate(d.datetime));
-        //
-        //focus.select("text.y4")
-        //    .attr("transform",
-        //    "translate(" + x(d.datetime) + "," +
-        //    y(d.play) + ")")
-        //    .text(formatDate(d.datetime));
-
         focus.select(".x")
             .attr("transform",
             "translate(" + x(d.datetime) + "," +
@@ -431,69 +435,30 @@ d3.json(url, function (error, data) {
             y(d.play) + ")")
             .attr("x2", width + width);
 
-        tooltip.style("left", d3.event.pageX + "px")
-            .style("top", d3.event.pageY + "px");
+        tooltip.select("#tooltip-title")
+            .text(function(){
+                var month_number = d.datetime.getMonth();
+                var date = d.datetime.getDate() + " " + get_month(month_number)  + " " + (d.datetime.getFullYear() + 1);
+                return date;
+            });
 
-        tooltip.select(".fb")
+        tooltip.selectAll(".tooltip-value")
             .data(stores)
-            .select(".store")
             .text(function(d){
-                return "fb";
-            });
-        tooltip.select(".fb")
-            .select(".value")
-            .text(function(){
-                var value = d3.select("circle.fb").attr("value");
-                return value;
-            });
-        tooltip.select(".play")
-            .data(stores)
-            .select(".store")
-            .text(function(d){
-                return "play";
-            });
-        tooltip.select(".play")
-            .select(".value")
-            .text(function(){
-                var value = d3.select("circle.play").attr("value");
-                return value;
-            });
-        tooltip.select(".appstore")
-            .data(stores)
-            .select(".store")
-            .text(function(d){
-                return "appstore";
-            });
-        tooltip.select(".appstore")
-            .select(".value")
-            .text(function(){
-                var value = d3.select("circle.appstore").attr("value");
+                var value = d3.select("circle." + d.name).attr("value");
                 return value;
             });
     }
-
-    d3.selectAll(".date")
-        .data(data)
-        .text(function (d) {
-            var lastArrayItem = data[data.length - 1];
-            var date = lastArrayItem.datetime;
-            return date.getDate() + "." + (date.getMonth() + 1) + "." + (date.getFullYear() + 1);
-        });
-    d3.selectAll(".value")
-        .data(data)
-        .text(function (d) {
-            var lastArrayItem = data[data.length - 1];
-            var store_id = this.getAttribute("data-store");
-            return store_data(lastArrayItem, store_id);
-        });
-    d3.selectAll(".difference")
-        .data(data)
-        .text(function (d) {
-            var lastArrayItem = data[data.length - 1];
-            var store_id = this.getAttribute("data-store");
-            return store_data(lastArrayItem, store_id) + "%";
-        });
 });
+
+var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function get_month(month_number){
+    switch(month_number){
+        case month_number:
+            return months[month_number];
+    }
+    //return ;
+}
 
 function store_data(d, store_id) {
     switch (store_id) {
@@ -542,7 +507,7 @@ function mouseover(d) {
         .style("color", "red")
         .text(function () {
             var previousValue = element.previousSibling.getAttribute("value");
-            var currentValue = element.getAttribute("value")
+            var currentValue = element.getAttribute("value");
 
             switch (previousValue) {
                 case null:
@@ -598,25 +563,20 @@ function update_graphs() {
             })
         ]);
 
-        // Remove all grids before adding new ones
-        d3.selectAll(".grid")
-            .remove();
-
         // Select the section we want to apply our changes to
         var svg = d3.select(".chart");
 
-        // Draw horizontal lines
-        svg.select("g").append("g")
-            .attr("class", "grid")
+        // Redraw vertical grid
+        svg.select(".grid.x")
             .attr("transform", "translate(0," + height + ")")
             .call(make_x_axis()
                 .tickSize(-height, 0, 0)
                 .tickFormat("")
         );
 
-        // Draw vertical lines
-        svg.select("g").append("g")
-            .attr("class", "grid")
+        //Redraw horizontal grid
+        svg.select(".grid.y")
+            //.attr("transform", "translate(0," + height + ")")
             .call(make_y_axis()
                 .tickSize(-width, 0, 0)
                 .tickFormat("")
@@ -632,74 +592,6 @@ function update_graphs() {
                 return valueline(d.values);
             })
             .style("display", "inline");
-
-        //store.selectAll("text")
-        //    .data(stores)
-        //    .datum(function(d) { return {name: d.name, value: d.values[d.values.length - 1]}; })
-        //    .transition()
-        //    .duration(750)
-        //    .attr("transform", function(d) { return "translate(" + x(d.value.datetime) + "," + y(d.value.store) + ")"; })
-        //    .attr("x", 3)
-        //    .attr("dy", ".35em")
-        //    .text(function(d) { return d.name; });
-
-        // Make the changes
-        // change the line facebook
-        //svg.select("#fb")
-        //    .duration(750)
-        //    .style("display", "inline")
-        //    .attr("d", valueline(data));
-        //
-        //// change the line playstore
-        //svg.select("#play")
-        //    .duration(750)
-        //    .style("display", "inline")
-        //    .style("stroke", "red")
-        //    .attr("d", valueline_play(data));
-        //// change the line appstore
-        //svg.select("#appstore")
-        //    .duration(750)
-        //    .style("display", "inline")
-        //    .style("stroke", "green")
-        //    .attr("d", valueline_appstore(data));
-        //
-
-        // append the x line
-        //focus.append("line")
-        //    .data(stores)
-        //    .attr("class", "x")
-        //    .style("stroke", function (d) {
-        //        return color(d.name);
-        //    })
-        //    .style("stroke-dasharray", "3,3")
-        //    .style("opacity", 0.5)
-        //    .attr("y1", 0)
-        //    .attr("y2", height);
-
-        //// append the y line
-        //focus.append("line")
-        //    .data(stores)
-        //    .attr("class", "y")
-        //    .style("stroke", function(d){
-        //        return color(d.name);
-        //    })
-        //    .style("stroke-dasharray", "3,3")
-        //    .style("opacity", 0.5)
-        //    .attr("x1", width)
-        //    .attr("x2", width);
-
-        // append the circle at the intersection
-        //focus.selectAll("circle")
-            //.data(stores)
-            //.enter().append("circle")
-            //.attr("class", function (d) {
-            //    return d.name;
-            //})
-            //.style("fill", "#FFFFFF")
-            //.style("stroke", function (d) {
-            //    return color(d.name);
-            //})
-            //.attr("r", 4);
 
         //append the rectangle to capture mouse
         svg.select(".rect-capture-mouse")
@@ -741,30 +633,6 @@ function update_graphs() {
                 "translate(" + x(d.datetime) + "," +
                 y(d.appstore) + ")");
 
-            //focus.select("text.y1")
-            //    .attr("transform",
-            //    "translate(" + x(d.datetime) + "," +
-            //    y(d.play) + ")")
-            //    .text(d.play);
-            //
-            //focus.select("text.y2")
-            //    .attr("transform",
-            //    "translate(" + x(d.datetime) + "," +
-            //    y(d.play) + ")")
-            //    .text(d.play);
-            //
-            //focus.select("text.y3")
-            //    .attr("transform",
-            //    "translate(" + x(d.datetime) + "," +
-            //    y(d.play) + ")")
-            //    .text(formatDate(d.datetime));
-            //
-            //focus.select("text.y4")
-            //    .attr("transform",
-            //    "translate(" + x(d.datetime) + "," +
-            //    y(d.play) + ")")
-            //    .text(formatDate(d.datetime));
-
             focus.select(".x")
                 .attr("transform",
                 "translate(" + x(d.datetime) + "," +
@@ -777,69 +645,20 @@ function update_graphs() {
                 y(d.play) + ")")
                 .attr("x2", width + width);
 
-            tooltip.style("left", d3.event.pageX + "px")
-                .style("top", d3.event.pageY + "px");
-
-            tooltip.select(".fb")
-                .data(stores)
-                .select(".store")
-                .text(function(d){
-                    return "fb";
-                });
-            tooltip.select(".fb")
-                .select(".value")
+            tooltip.select("#tooltip-title")
                 .text(function(){
-                    var value = d3.select("circle.fb").attr("value");
-                    return value;
-                });
-            tooltip.select(".play")
-                .data(stores)
-                .select(".store")
-                .text(function(d){
-                    return "play";
-                });
-            tooltip.select(".play")
-                .select(".value")
-                .text(function(){
-                    var value = d3.select("circle.play").attr("value");
-                    return value;
-                });
-            tooltip.select(".appstore")
-                .data(stores)
-                .select(".store")
-                .text(function(d){
-                    return "appstore";
-                });
-            tooltip.select(".appstore")
-                .select(".value")
-                .text(function(){
-                    var value = d3.select("circle.appstore").attr("value");
-                    return value;
+                    var month_number = d.datetime.getMonth();
+                    var date = d.datetime.getDate() + " " + get_month(month_number)  + " " + (d.datetime.getFullYear() + 1);
+                    return date;
                 });
 
+            tooltip.selectAll(".tooltip-value")
+                .data(stores)
+                .text(function(d){
+                    var value = d3.select("circle." + d.name).attr("value");
+                    return value;
+                });
         }
-
-        d3.selectAll(".date")
-            .data(data)
-            .text(function (d) {
-                var lastArrayItem = data[data.length - 1];
-                var date = lastArrayItem.datetime;
-                return date.getDate() + "." + (date.getMonth() + 1) + "." + (date.getFullYear() + 1);
-            });
-        d3.selectAll(".value")
-            .data(data)
-            .text(function (d) {
-                var lastArrayItem = data[data.length - 1];
-                var store_id = this.getAttribute("data-store");
-                return store_data(lastArrayItem, store_id);
-            });
-        d3.selectAll(".difference")
-            .data(data)
-            .text(function (d) {
-                var lastArrayItem = data[data.length - 1];
-                var store_id = this.getAttribute("data-store");
-                return store_data(lastArrayItem, store_id);
-            });
 
         // update the x axis
         svg.select(".x.axis")
@@ -862,133 +681,21 @@ function update_graphs() {
 }
 
 function show_all_graphs() {
-    //d3.json(url, function (error, data) {
-    //
-    //    color.domain(d3.keys(data[0]).filter(function (key) {
-    //        return key !== "datetime";
-    //    }));
-    //
-    //    data.forEach(function (d) {
-    //        d.datetime = parseDate(d.datetime);
-    //    });
-    //
-    //    var stores = color.domain().map(function (name) {
-    //        return {
-    //            name: name,
-    //            values: data.map(function (d) {
-    //                return {datetime: d.datetime, store: +d[name]};
-    //            })
-    //        };
-    //    });
-    //
-    //    // Scale the range of the data again
-    //    x.domain(d3.extent(data, function (d) {
-    //        return d.datetime;
-    //    }));
-    //    y.domain([
-    //        d3.min(stores, function (c) {
-    //            return d3.min(c.values, function (v) {
-    //                return v.store;
-    //            });
-    //        }),
-    //        d3.max(stores, function (c) {
-    //            return d3.max(c.values, function (v) {
-    //                return v.store;
-    //            });
-    //        })
-    //    ]);
-
     // Select the section we want to apply our changes to
     var svg = d3.select(".chart");
 
-    var store = svg.selectAll(".store")
-        .style("display", "block");
-
-    store.select("path")
-        .transition()
-        .duration(450)
-        .style("display", "inline");
-
-    store.selectAll("circle")
-        .style("display", "inline");
+    svg.selectAll(".store")
+        .style("display", null);
 
     focus.selectAll("circle")
         .style("display", null);
-
-    // Make the changes
-    // change the line facebook
-    //svg.select("#fb")
-    //    .duration(750)
-    //    .style("display", "inline")
-    //    .attr("d", valueline(data));
-    //
-    //// change the line playstore
-    //svg.select("#play")
-    //    .duration(750)
-    //    .style("display", "inline")
-    //    .style("stroke", "red")
-    //    .attr("d", valueline_play(data));
-    //// change the line appstore
-    //svg.select("#appstore")
-    //    .duration(750)
-    //    .style("display", "inline")
-    //    .style("stroke", "green")
-    //    .attr("d", valueline_appstore(data));
-    //
-    //svg.selectAll(".fb-dot")
-    //    .duration(750)
-    //    .style("display", "inline")
-    //    .attr("r", 3.5)
-    //    .attr("cx", function (d) {
-    //        return x(d.datetime);
-    //    })
-    //    .attr("cy", function (d) {
-    //        return y(d.fb);
-    //    })
-    //    .attr("value", function (d) {
-    //        return d.fb;
-    //    });
-    //
-    //svg.selectAll(".play-dot")
-    //    .duration(750)
-    //    .style("display", "inline")
-    //    .attr("r", 3.5)
-    //    .attr("cx", function (d) {
-    //        return x(d.datetime);
-    //    })
-    //    .attr("cy", function (d) {
-    //        return y1(d.play);
-    //    })
-    //    .attr("value", function (d) {
-    //        return d.play;
-    //    });
-    //
-    //svg.selectAll(".appstore-dot")
-    //    .duration(750)
-    //    .style("display", "inline")
-    //    .attr("r", 3.5)
-    //    .attr("cx", function (d) {
-    //        return x(d.datetime);
-    //    })
-    //    .attr("cy", function (d) {
-    //        return y2(d.appstore);
-    //    })
-    //    .attr("value", function (d) {
-    //        return d.appstore;
-    //    });
-    //});
 }
 
 function hide_all_graphs() {
     // Select the section we want to apply our changes to
     var svg = d3.select(".chart").transition();
 
-    var store = svg.selectAll(".store");
-
-    // Hide all graphs
-    store.select("path")
-        .style("display", "none");
-    store.selectAll("circle")
+    svg.selectAll(".store")
         .style("display", "none");
 
     focus.selectAll("circle")
@@ -996,79 +703,16 @@ function hide_all_graphs() {
 }
 
 function show_store_graph(store_id) {
-    // Get the data again
-    d3.json(url, function (error, data) {
-        color.domain(d3.keys(data[0]).filter(function (key) {
-            return key !== "datetime";
-        }));
+    // Select the section we want to apply our changes to
+    var svg = d3.select(".chart").transition();
 
-        data.forEach(function (d) {
-            d.datetime = parseDate(d.datetime);
-            //d.fb = +d.fb;
-            //d.play = +d.play;
-            //d.appstore = +d.appstore;
-        });
+    // Show selected store
+    svg.select("#" + store_id)
+        .duration(750)
+        .style("display", null);
 
-        var stores = color.domain().map(function (name) {
-            return {
-                name: name,
-                values: data.map(function (d) {
-                    return {datetime: d.datetime, store: +d[name]};
-                })
-            };
-        });
-
-        // Scale the range of the data again
-        x.domain(d3.extent(data, function (d) {
-            return d.datetime;
-        }));
-        y.domain([
-            d3.min(stores, function (c) {
-                return d3.min(c.values, function (v) {
-                    return v.store;
-                });
-            }),
-            d3.max(stores, function (c) {
-                return d3.max(c.values, function (v) {
-                    return v.store;
-                });
-            })
-        ]);
-
-        // Select the section we want to apply our changes to
-        var svg = d3.select(".chart").transition();
-
-        var store = svg.selectAll(".city");
-
-        store.select("path")
-            .attr("d", function (d) {
-                return valueline(d.values);
-            })
-            .style("display", "inline")
-            .style("stroke", function (d) {
-                return color(d.name);
-            });
-
-        // Show selected store
-        svg.select("#" + store_id)
-            .duration(750)
-            .style("display", "inline");
-        svg.selectAll("." + store_id + "-dot")
-            .duration(750)
-            .style("display", "inline");
-
-        focus.select("circle." + store_id)
-            .style("display", null);
-
-
-        //svg.select(".x.axis") // change the x axis
-        //    .duration(750)
-        //    .call(xAxis);
-        //svg.select(".y.axis") // change the y axis
-        //    .duration(750)
-        //    .call(yAxis);
-
-    });
+    focus.select("circle." + store_id)
+        .style("display", null);
 }
 
 function hide_store_graph(store_id) {
@@ -1080,30 +724,28 @@ function hide_store_graph(store_id) {
     svg.select("#" + store_id)
         .duration(750)
         .style("display", "none");
-    svg.selectAll("." + store_id + "-dot")
-        .duration(750)
-        .style("display", "none");
     focus.select("circle." + store_id)
         .style("display", "none");
 
 }
 
 d3.select("#update").on("click", update_graphs);
-d3.selectAll(".store-controls").on("click", function () {
-    var store_id = this.getAttribute("value");
-    var controls = document.getElementsByClassName("store-controls");
-    if (this.checked) {
-        show_store_graph(store_id);
-    } else {
-        hide_store_graph(store_id);
-    }
-    if (controls[1].checked && controls[2].checked && controls[3].checked) {
-        controls[0].checked = true;
-    } else {
-        controls[0].checked = false;
-    }
 
-});
+var clicked = false;
+window.onload = function(){
+    console.log("loaded");
+    d3.selectAll(".legend-text").on("click", function () {
+        var store_id = this.getAttribute("data-store");
+        if (clicked) {
+            show_store_graph(store_id);
+            clicked = false;
+        } else {
+            hide_store_graph(store_id);
+            clicked = true;
+        }
+    });
+};
+
 d3.select("#show-all").on("click", function () {
     if (this.checked) {
         check_all();
@@ -1231,18 +873,18 @@ d3.select("#show-all").on("click", function () {
 //});
 
 
-function check_all() {
-    var controls = document.getElementsByClassName("store-controls");
-    for (var i = 0; i < controls.length; i++) {
-        controls[i].checked = true;
-    }
-}
-
-function uncheck_all() {
-    var controls = document.getElementsByClassName("store-controls");
-    for (var i = 0; i < controls.length; i++) {
-        controls[i].checked = false;
-    }
-}
-
-check_all();
+//function check_all() {
+//    var controls = document.getElementsByClassName("store-controls");
+//    for (var i = 0; i < controls.length; i++) {
+//        controls[i].checked = true;
+//    }
+//}
+//
+//function uncheck_all() {
+//    var controls = document.getElementsByClassName("store-controls");
+//    for (var i = 0; i < controls.length; i++) {
+//        controls[i].checked = false;
+//    }
+//}
+//
+//check_all();

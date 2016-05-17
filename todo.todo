@@ -1,5 +1,5 @@
 chart:
-  ☐ on hover show tooltip forever on the right after the graph
+  ✔ on hover show tooltip forever on the right after the graph @done (16-05-17 16:28)
   ✔ change buttons with select possibility to choose several graphs @done (16-05-13 08:56)
   ✔ input checkboxes work async @done (16-05-13 08:56)
   ☐ ajax load
@@ -21,4 +21,5 @@ bugs:
 refactoring: 
   ✔ too many identical function. in that book there is a chapter in the end that says how to color different lines better @done (16-05-13 13:13)
   ☐ showing circles and x line on hover works only for three lines, they are drawn not automatically
-  ☐ on update tooltip shows incorrect data
+  ✔ on update tooltip shows incorrect data @done (16-05-17 16:28)
+  ✔ after update x and y axis are above lines @done (16-05-17 16:28)
