@@ -34,8 +34,7 @@
             stroke-width: 0;
         }
 
-        #tooltip {
-            position: absolute;
+        #tooltip, #legend {
             width: auto;
             height: auto;
             padding: 10px;
@@ -44,47 +43,25 @@
             -webkit-box-shadow: 4px 4px 4px -3px rgba(0, 0, 0, 0.4);
             -moz-box-shadow: 4px 4px 4px -3px rgba(0, 0, 0, 0.4);
             box-shadow: 4px 4px 4px -3px rgba(0, 0, 0, 0.4);
+        }
+        
+        #tooltip {
+            position: absolute;
             pointer-events: none;
         }
 
-        #tooltip p {
-            margin: 0;
-            font-family: sans-serif;
-            font-size: 16px;
-            line-height: 20px;
-        }
-
-        #controls {
-            /*display: inline-block;*/
-        }
-
-        #fb .title {
-            color: blue;
-        }
-
-        #play .title {
-            color: red;
-        }
-
-        #appstore .title {
-            color: green;
-        }
-        
         #legend {
             display: inline-block;
-            padding: 10px;
-            border: 1px solid #ccc;
-            -webkit-border-radius: 4px;
-            -moz-border-radius: 4px;
-            border-radius: 4px;
         }
 
-        #tooltip .tooltip-section div {
+        #tooltip .tooltip-section div,
+        #legend .legend-section div{
             display: inline-block;
             margin-right: 4px;
         }
 
-        #tooltip .tooltip-section .tooltip-swatch {
+        #tooltip .tooltip-section .tooltip-swatch,
+        #legend .legend-section .legend-swatch{
             width: 10px;
             height: 10px;
         }
@@ -97,6 +74,7 @@
             width: 20px;
         }
     </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 </head>
 
@@ -104,11 +82,12 @@
 <div>
     <div id="controls">
         <button id="update">update</button>
-        <button id="week">week</button>
-        <button id="month">month</button>
+        <!--<button id="week">week</button>-->
+        <!--<button id="month">month</button>-->
     </div>
     <svg class="chart"></svg>
     <div id="tooltip"></div>
+    <div id="legend"></div>
 </div>
 <script src="main.js"></script>
 </body>

@@ -1,11 +1,11 @@
 // Set the dimensions of the canvas / graph
 var margin = {
         top: 30,
-        right: 300,
+        right: 30,
         bottom: 50,
         left: 30
     },
-    width = 950 - margin.left - margin.right,
+    width = 650 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
 
 var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -17,8 +17,6 @@ function get_month(month_number){
 }
 
 var data;
-
-var yTranslate = 0;
 
 var url = "data.json";
 
@@ -171,50 +169,65 @@ d3.json(url, function (error, data) {
             return color(d.name);
         });
 
-    var legend = svg.append("g")
-        .attr("transform", "translate(" + (width + margin.left) + ",0)");
+    var legend = d3.select("#legend");
 
-    legend.append("rect")
-        .attr("stroke", "#ccc")
-        .attr("stroke-width", .4)
-        .attr("fill", "none")
+    var legend_section = legend.selectAll("div")
+        .data(stores)
+        .enter().append("div")
+        .attr("class", "legend-section")
         .attr("width", width / 4)
         .attr("height", height / 4);
 
-    var legend_group = legend.selectAll("g")
-        .data(stores)
-        .enter().append("g")
-        .attr("class", "legend");
-
-    legend_group.append("rect")
-        .attr("class", "rect")
-        .attr("width", 10)
-        .attr("height", 10)
-        .attr("id", function (d) {
-            return d.name + "1";
-        })
-        .style("fill", function (d) {
+    legend_section.append("div")
+        .attr("class", "legend-swatch")
+        .style("background-color", function (d) {
             return color(d.name);
-        })
-        .attr("transform", function (d) {
-            yTranslate += 20;
-            return "translate(20, " + yTranslate + ")";
         });
 
-    yTranslate = 10;
-
-    legend_group.append("text")
-        .attr("class", "legend-text")
+    legend_section.append("div")
+        .attr("class", "legend-title")
         .attr("data-store", function(d){
             return d.name;
         })
-        .attr("transform", function () {
-            yTranslate += 20;
-            return "translate(40, " + yTranslate + ")";
+        .attr("id", function(d){
+            return d.name + "1";
         })
         .text(function (d) {
             return d.name;
         });
+
+    tooltip.append("div")
+        .attr("id", "tooltip-title")
+        .style("font-weight", "bold")
+        .text("Stores");
+
+    var tooltip_section = tooltip.selectAll(".store")
+        .data(stores)
+        .enter().append("div")
+        .attr("class", "tooltip-section");
+
+    tooltip_section.append("div")
+        .attr("class", "tooltip-swatch")
+        .style("background-color", function(d){
+            return color(d.name);
+        });
+
+    tooltip_section.append("div")
+        .attr("class", "tooltip-title")
+        .attr("title", function(d){
+            return d.name;
+        })
+        .text(function(d){
+            return d.name;
+        });
+
+    tooltip_section.append("div")
+        .attr("class", "tooltip-value")
+        .text(function(d){
+            // return last value
+            return d.values[d.values.length - 1].store;
+        });
+
 
     // don't know what's this for
     // Add the valueline path.
@@ -264,37 +277,6 @@ d3.json(url, function (error, data) {
             focus.style("display", "none");
         })
         .on("mousemove", mousemove);
-
-    tooltip.append("div")
-        .attr("id", "tooltip-title")
-        .style("font-weight", "bold")
-        .text("Stores");
-
-    var tooltip_section = tooltip.selectAll(".store")
-        .data(stores)
-        .enter().append("div")
-        .attr("class", "tooltip-section");
-
-    tooltip_section.append("div")
-        .attr("class", "tooltip-swatch")
-        .style("background-color", function(d){
-            return color(d.name);
-        });
-
-    tooltip_section.append("div")
-        .attr("class", "tooltip-title")
-        .attr("title", function(d){
-            return d.name;
-        })
-        .text(function(d){
-            return d.name;
-        });
-    //not sure if it's needed
-    //tooltip_section.append("div")
-    //    .attr("class", "tooltip-value")
-    //    .text(function(d){
-    //        return d.values[d.values.length - 1].store;
-    //    });
 
     function mousemove() {
         var x0 = x.invert(d3.mouse(this)[0]),
@@ -549,15 +531,26 @@ d3.select("#update").on("click", update_graphs);
 
 var clicked = false;
 window.onload = function(){
+
+    var z = document.getElementsByClassName("legend-title");
+    for(var i = 0; i < z.length; i++){
+        z[i].addEventListener("click", function(){
+           console.log(this);
+        });
+    }
     console.log("loaded");
-    d3.selectAll(".legend-text").on("click", function () {
-        var store_id = this.getAttribute("data-store");
-        if (clicked) {
-            select_store_graph(store_id);
-            clicked = false;
-        } else {
-            deselect_store_graph(store_id);
-            clicked = true;
-        }
-    });
+    //d3.selectAll(".legend-title").on("click", function () {
+    //    var store_id = this.getAttribute("data-store");
+    //    if (clicked) {
+    //        select_store_graph(store_id);
+    //        clicked = false;
+    //    } else {
+    //        deselect_store_graph(store_id);
+    //        clicked = true;
+    //    }
+    //});
 };
+
+
+
+
