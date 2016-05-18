@@ -34,7 +34,8 @@
             stroke-width: 0;
         }
 
-        #tooltip, #legend {
+        #tooltip,
+        #legend {
             width: auto;
             height: auto;
             padding: 10px;
@@ -44,7 +45,7 @@
             -moz-box-shadow: 4px 4px 4px -3px rgba(0, 0, 0, 0.4);
             box-shadow: 4px 4px 4px -3px rgba(0, 0, 0, 0.4);
         }
-        
+
         #tooltip {
             position: absolute;
             pointer-events: none;
@@ -52,16 +53,17 @@
 
         #legend {
             display: inline-block;
+            vertical-align: top;
         }
 
         #tooltip .tooltip-section div,
-        #legend .legend-section div{
+        #legend .legend-section div {
             display: inline-block;
             margin-right: 4px;
         }
 
         #tooltip .tooltip-section .tooltip-swatch,
-        #legend .legend-section .legend-swatch{
+        #legend .legend-section .legend-swatch {
             width: 10px;
             height: 10px;
         }
@@ -73,6 +75,13 @@
         #tooltip .tooltip-section .tooltip-value {
             width: 20px;
         }
+
+        #refresh {
+            display: inline-block;
+            vertical-align: middle;
+            float: right;
+            cursor: pointer;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -80,11 +89,10 @@
 
 <body>
 <div>
-    <div id="controls">
-        <button id="update">update</button>
+    <!--<div id="controls">-->
         <!--<button id="week">week</button>-->
         <!--<button id="month">month</button>-->
-    </div>
+    <!--</div>-->
     <svg class="chart"></svg>
     <div id="tooltip"></div>
     <div id="legend"></div>
