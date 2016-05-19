@@ -17,8 +17,6 @@ function get_month(month_number) {
     }
 }
 
-var data;
-
 var url = "data.json";
 
 // Parse the date / time
@@ -50,8 +48,24 @@ var valueline = d3.svg.line()
         return y(d.store);
     });
 
+// Define the line for store
+var valueline_sum = d3.svg.line()
+    .x(function (d) {
+        return x(d.datetime);
+    })
+    .y(function (d) {
+        return y(d.value);
+    });
+
 // Create SVG element
 var svg = d3.select(".chart")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// Create SVG element
+var sum = d3.select(".sum")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
@@ -147,6 +161,23 @@ d3.json(url, function (error, data) {
             .tickFormat("")
     );
 
+    // Draw horizontal lines
+    sum.append("g")
+        .attr("class", "x grid")
+        .attr("transform", "translate(0," + height + ")")
+        .call(make_x_axis()
+            .tickSize(-height, 0, 0)
+            .tickFormat("")
+    );
+
+    // Draw vertical lines
+    sum.append("g")
+        .attr("class", "y grid")
+        .call(make_y_axis()
+            .tickSize(-width, 0, 0)
+            .tickFormat("")
+    );
+
     // Add the X Axis
     svg.append("g")
         .attr("class", "x axis")
@@ -162,7 +193,22 @@ d3.json(url, function (error, data) {
         .attr("class", "y axis")
         .call(yAxis);
 
-    var store = svg.selectAll(".city")
+    // Add the X Axis
+    sum.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-45)");
+    // Add the Y Axis
+    sum.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+
+    var store = svg.selectAll(".graph")
         .data(stores)
         .enter().append("g")
         .attr("class", "graph")
@@ -180,6 +226,38 @@ d3.json(url, function (error, data) {
         .style("stroke", function (d) {
             return color(d.name);
         });
+
+    var store_sum = sum.append("g")
+        .data(stores)
+        .attr("class", "graph")
+        .attr("id", "overall");
+
+    // Add the valueline path for stores.
+    store_sum.append("path")
+        .attr("class", "line")
+        .attr("fill", "none")
+        .attr("d", function (d) {
+            //console.log(data[0].datetime);
+            var number = [];;
+            for (var i = 0; i < stores[0].values.length; i++){
+                number.push({
+                    datetime: data[i].datetime,
+                    value: 0
+                });
+            }
+            for(var i = 0; i < stores.length; i++){
+                //console.log(stores[i]);
+                for(var j = 0; j < stores[i].values.length; j++){
+                    //console.log(stores[i].values[j].store);
+                    //console.log(number[j]);
+                    number[j].value += parseInt(stores[i].values[j].store);
+                    //console.log(number[j], stores[i].values[j].store);
+                }
+            }
+            //console.log(number);
+            return valueline_sum(number);
+        })
+        .style("stroke", "#000");
 
     legend.append("div")
         .attr("id", "legend-title")
