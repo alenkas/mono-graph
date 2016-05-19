@@ -21,6 +21,7 @@ bugs:
   ✔ after selecting single graph dots for hidden graphs also seen @done (16-05-18 15:25)
   ✔ after update tooltip values are shown incorrectly @done (16-05-18 15:25)
   ✔ on graph hover if one graph is select tooltip shows data for each graph, not for the selected one @done (16-05-18 15:32)
+  ☐ after graph is back to visible state hover function is not working. line 622
 
 refactoring: 
   ✔ too many identical function. in that book there is a chapter in the end that says how to color different lines better @done (16-05-13 13:13)

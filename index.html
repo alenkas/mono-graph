@@ -57,13 +57,13 @@
         }
 
         #tooltip .tooltip-section div,
-        #legend .legend-section div {
+        #legend .legend-item div {
             display: inline-block;
             margin-right: 4px;
         }
 
         #tooltip .tooltip-section .tooltip-swatch,
-        #legend .legend-section .legend-swatch {
+        #legend .legend-item .legend-swatch {
             width: 10px;
             height: 10px;
         }
@@ -82,6 +82,16 @@
             float: right;
             cursor: pointer;
         }
+
+        .hidden {
+            display: none;
+        }
+        
+        .transparent,
+        .legend-item-hidden {
+            opacity: .3;
+        }
+
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
     <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>

@@ -1,4 +1,3 @@
-
 // Set the dimensions of the canvas / graph
 var margin = {
         top: 30,
@@ -25,7 +24,7 @@ var url = "data.json";
 // Parse the date / time
 var parseDate = d3.time.format("%Y-%m-%d").parse,
     formatDate = d3.time.format("%d-%b"),
-    bisectDate = d3.bisector(function(d) {
+    bisectDate = d3.bisector(function (d) {
         return d.datetime;
     }).left;
 
@@ -44,10 +43,10 @@ var yAxis = d3.svg.axis().scale(y)
 
 // Define the line for store
 var valueline = d3.svg.line()
-    .x(function(d) {
+    .x(function (d) {
         return x(d.datetime);
     })
-    .y(function(d) {
+    .y(function (d) {
         return y(d.store);
     });
 
@@ -68,6 +67,9 @@ var tooltip = d3.select("#tooltip")
     .style("left", svgElementPosition.left + margin.left * 1.5 + "px")
     .style("top", svgElementPosition.top + margin.top * 1.5 + "px")
     .style("display", "none");
+
+var legend = d3.select("#legend");
+legend.style("margin-top", margin.top + "px");
 
 function make_x_axis() {
     return d3.svg.axis()
@@ -90,39 +92,39 @@ var focus = svg.append("g")
     .attr("class", "hover")
     .style("display", "none");
 
-d3.json(url, function(error, data) {
+d3.json(url, function (error, data) {
 
     if (error) return console.warn(error);
 
-    color.domain(d3.keys(data[0]).filter(function(key) {
+    color.domain(d3.keys(data[0]).filter(function (key) {
         return key !== "datetime";
     }));
 
-    data.forEach(function(d) {
+    data.forEach(function (d) {
         d.datetime = parseDate(d.datetime);
     });
 
-    var stores = color.domain().map(function(name) {
+    var stores = color.domain().map(function (name) {
         return {
             name: name,
-            values: data.map(function(d) {
-                return { datetime: d.datetime, store: +d[name] };
+            values: data.map(function (d) {
+                return {datetime: d.datetime, store: +d[name]};
             })
         };
     });
 
-    x.domain(d3.extent(data, function(d) {
+    x.domain(d3.extent(data, function (d) {
         return d.datetime;
     }));
 
     y.domain([
-        d3.min(stores, function(c) {
-            return d3.min(c.values, function(v) {
+        d3.min(stores, function (c) {
+            return d3.min(c.values, function (v) {
                 return v.store;
             });
         }),
-        d3.max(stores, function(c) {
-            return d3.max(c.values, function(v) {
+        d3.max(stores, function (c) {
+            return d3.max(c.values, function (v) {
                 return v.store;
             });
         })
@@ -163,8 +165,8 @@ d3.json(url, function(error, data) {
     var store = svg.selectAll(".city")
         .data(stores)
         .enter().append("g")
-        .attr("class", "store")
-        .attr("id", function(d) {
+        .attr("class", "graph")
+        .attr("id", function (d) {
             return d.name;
         });
 
@@ -172,46 +174,48 @@ d3.json(url, function(error, data) {
     store.append("path")
         .attr("class", "line")
         .attr("fill", "none")
-        .attr("d", function(d) {
+        .attr("d", function (d) {
             return valueline(d.values);
         })
-        .style("stroke", function(d) {
+        .style("stroke", function (d) {
             return color(d.name);
         });
-
-    var legend = d3.select("#legend");
-    legend.style("margin-top", margin.top + "px");
 
     legend.append("div")
         .attr("id", "legend-title")
         .text("Stores")
         .append("span")
         .attr("id", "refresh")
-        .attr("class", "ui-icon ui-icon-arrowrefresh-1-e");
+        .attr("class", "ui-icon ui-icon-arrowrefresh-1-e")
+        .on("click", update_graphs);
 
-    var legend_section = legend.selectAll(".legend-section")
+    var legend_section = legend.selectAll(".legend-item")
         .data(stores)
         .enter().append("div")
-        .attr("class", "legend-section")
+        .attr("class", function(d){
+            return "legend-item " + "legend-item-" + d.name;
+        })
         .attr("width", width / 4)
-        .attr("height", height / 4);
+        .attr("height", height / 4)
+        .attr("data-store", function (d) {
+            return d.name;
+        })
+        .on("click", click_function)
+        .on("mouseover", hover)
+        .on("mouseout", mouseout);
 
     legend_section.append("div")
         .attr("class", "legend-swatch")
-        .style("background-color", function(d) {
+        .style("background-color", function (d) {
             return color(d.name);
         });
 
     legend_section.append("div")
         .attr("class", "legend-title")
-        .attr("data-store", function(d) {
+        .attr("data-store", function (d) {
             return d.name;
         })
-        //this is just for testing
-        .attr("id", function(d) {
-            return d.name + "1";
-        })
-        .text(function(d) {
+        .text(function (d) {
             return d.name;
         });
 
@@ -220,31 +224,31 @@ d3.json(url, function(error, data) {
         .style("font-weight", "bold")
         .text("Stores");
 
-    var tooltip_section = tooltip.selectAll(".store")
+    var tooltip_section = tooltip.selectAll(".graph")
         .data(stores)
         .enter().append("div")
-        .attr("class", function(d){
+        .attr("class", function (d) {
             return "tooltip-section " + d.name;
         });
 
     tooltip_section.append("div")
         .attr("class", "tooltip-swatch")
-        .style("background-color", function(d) {
+        .style("background-color", function (d) {
             return color(d.name);
         });
 
     tooltip_section.append("div")
         .attr("class", "tooltip-title")
-        .attr("title", function(d) {
+        .attr("title", function (d) {
             return d.name;
         })
-        .text(function(d) {
+        .text(function (d) {
             return d.name;
         });
 
     tooltip_section.append("div")
         .attr("class", "tooltip-value")
-        .text(function(d) {
+        .text(function (d) {
             // return last value
             return d.values[d.values.length - 1].store;
         });
@@ -260,7 +264,7 @@ d3.json(url, function(error, data) {
     focus.append("line")
         .data(stores)
         .attr("class", "x")
-        .style("stroke", function(d) {
+        .style("stroke", function (d) {
             return color(d.name);
         })
         .style("stroke-dasharray", "3,3")
@@ -272,11 +276,11 @@ d3.json(url, function(error, data) {
     focus.selectAll("circle")
         .data(stores)
         .enter().append("circle")
-        .attr("class", function(d) {
+        .attr("class", function (d) {
             return d.name;
         })
         .style("fill", "#FFFFFF")
-        .style("stroke", function(d) {
+        .style("stroke", function (d) {
             return color(d.name);
         })
         .attr("r", 4);
@@ -289,11 +293,11 @@ d3.json(url, function(error, data) {
         .attr("class", "rect-capture-mouse")
         .style("fill", "none")
         .style("pointer-events", "all")
-        .on("mouseover", function() {
+        .on("mouseover", function () {
             tooltip.style("display", null);
             focus.style("display", null);
         })
-        .on("mouseout", function() {
+        .on("mouseout", function () {
             tooltip.style("display", "none");
             focus.style("display", "none");
         })
@@ -348,7 +352,7 @@ d3.json(url, function(error, data) {
             .attr("x2", width + width);
 
         tooltip.select("#tooltip-title")
-            .text(function() {
+            .text(function () {
                 var month_number = d.datetime.getMonth();
                 var date = d.datetime.getDate() + " " + get_month(month_number) + " " + (d.datetime.getFullYear() + 1);
                 return date;
@@ -356,7 +360,7 @@ d3.json(url, function(error, data) {
 
         tooltip.selectAll(".tooltip-value")
             .data(stores)
-            .text(function(d) {
+            .text(function (d) {
                 var value = d3.select("circle." + d.name).attr("value");
                 return value;
             });
@@ -364,37 +368,37 @@ d3.json(url, function(error, data) {
 });
 
 function update_graphs() {
-    d3.json("data1.json", function(error, data) {
+    d3.json("data1.json", function (error, data) {
 
-        color.domain(d3.keys(data[0]).filter(function(key) {
+        color.domain(d3.keys(data[0]).filter(function (key) {
             return key !== "datetime";
         }));
 
-        data.forEach(function(d) {
+        data.forEach(function (d) {
             d.datetime = parseDate(d.datetime);
         });
 
-        var stores = color.domain().map(function(name) {
+        var stores = color.domain().map(function (name) {
             return {
                 name: name,
-                values: data.map(function(d) {
-                    return { datetime: d.datetime, store: +d[name] };
+                values: data.map(function (d) {
+                    return {datetime: d.datetime, store: +d[name]};
                 })
             };
         });
 
         // Scale the range of the data again
-        x.domain(d3.extent(data, function(d) {
+        x.domain(d3.extent(data, function (d) {
             return d.datetime;
         }));
         y.domain([
-            d3.min(stores, function(c) {
-                return d3.min(c.values, function(v) {
+            d3.min(stores, function (c) {
+                return d3.min(c.values, function (v) {
                     return v.store;
                 });
             }),
-            d3.max(stores, function(c) {
-                return d3.max(c.values, function(v) {
+            d3.max(stores, function (c) {
+                return d3.max(c.values, function (v) {
                     return v.store;
                 });
             })
@@ -419,13 +423,13 @@ function update_graphs() {
                 .tickFormat("")
         );
 
-        var store = svg.selectAll(".store")
+        var store = svg.selectAll(".graph")
             .data(stores);
 
         store.select("path")
             .transition()
             .duration(750)
-            .attr("d", function(d) {
+            .attr("d", function (d) {
                 return valueline(d.values);
             })
             .style("display", "inline");
@@ -438,11 +442,11 @@ function update_graphs() {
             //.attr("rect-capture-mouse")
             .style("fill", "none")
             .style("pointer-events", "all")
-            .on("mouseover", function() {
+            .on("mouseover", function () {
                 tooltip.style("display", null);
                 focus.style("display", null);
             })
-            .on("mouseout", function() {
+            .on("mouseout", function () {
                 tooltip.style("display", "none");
                 focus.style("display", "none");
             })
@@ -486,7 +490,7 @@ function update_graphs() {
                 .attr("x2", width + width);
 
             tooltip.select("#tooltip-title")
-                .text(function() {
+                .text(function () {
                     var month_number = d.datetime.getMonth();
                     var date = d.datetime.getDate() + " " + get_month(month_number) + " " + (d.datetime.getFullYear() + 1);
                     return date;
@@ -494,7 +498,7 @@ function update_graphs() {
 
             tooltip.selectAll(".tooltip-value")
                 .data(stores)
-                .text(function(d) {
+                .text(function (d) {
                     var value = d3.select("circle." + d.name).attr("value");
                     return value;
                 });
@@ -520,110 +524,100 @@ function update_graphs() {
     });
 }
 
-function select_store_graph(store_id) {
-    // Select the section we want to apply our changes to
-    var svg = d3.select(".chart").transition();
+function hide_element(){
+    var element_classes = d3.select(this).attr("class");
+    return element_classes + " hidden";
+}
 
-    svg.selectAll(".store").filter(function() {
-        d3.select(this)
-            .style("display", "none");
-        svg.select("#" + store_id)
-            .style("display", null);
-    });
+function transparent_element(){
+    var element_classes = d3.select(this).attr("class");
+    return element_classes + " transparent";
+}
 
-    focus.selectAll("circle").filter(function(){
-        d3.select(this).
-            style("display", "none");
-        focus.select("circle." + store_id)
-            .style("display", null);
-    });
-
-    tooltip.selectAll(".tooltip-section").filter(function(){
-        d3.select(this)
-            .style("display", "none");
-        tooltip.select(".tooltip-section." + store_id)
-            .style("display", null);
+function hide_graph(graph_id) {
+    d3.selectAll("#" + graph_id + ", circle." + graph_id + ", .tooltip-section." + graph_id)
+        .attr("class", hide_element);
+    d3.selectAll(".legend-item").filter(function(){
+       if(!d3.select(this).classed("legend-item-hidden")){
+           //console.log(true);
+           d3.select(this)
+               .classed("transparent", false);
+           d3.selectAll(".graph").filter(function(){
+               if(!d3.select(this).classed("hidden")){
+                   d3.select(this)
+                       .classed("transparent", false);
+               }
+           });
+       }
     });
 }
 
-function deselect_store_graph() {
+function show_graph(graph_id) {
+    d3.selectAll("#" + graph_id + ", circle." + graph_id + ", .tooltip-section." + graph_id)
+        .classed("hidden", false);
+}
 
-    // Select the section we want to apply our changes to
-    var svg = d3.select(".chart").transition();
+function hover() {
+    var graph_id = this.getAttribute("data-store");
+    var transparent = this.classList.contains("transparent");
+    var focused = this.classList.contains("legend-item-focused");
+    var hidden = this.classList.contains("legend-item-hidden");
 
-    svg.selectAll(".store").filter(function() {
-        d3.select(this)
-            .style("class", null)
-            .style("display", null);
+    if(!hidden){
+        this.classList.add("legend-item-focused");
+    }
+
+    d3.selectAll(".legend-item").filter(function(){
+        // Check if current element is hidden
+        if(!d3.select(this).classed("transparent")){
+            //console.log(false);
+            //console.log(d3.select(this));
+            if(hidden){
+                //console.log(true);
+            } else if(!d3.select(this).classed("legend-item-focused")){
+                //console.log(d3.select(this));
+                d3.select(this)
+                    .attr("class", transparent_element);
+                d3.selectAll(".graph").filter(function() {
+                    if(d3.select(this).attr("id") != graph_id){
+                        //console.log(true);
+                        d3.select(this)
+                            .attr("class", transparent_element);
+                    }
+                });
+            }
+        }
     });
 
-    focus.selectAll("circle").filter(function(){
-        d3.select(this)
-            .style("display", null);
-    });
-
-    tooltip.selectAll(".tooltip-section").filter(function(){
-        d3.select(this)
-            .style("display", null);
-    });
 
 }
 
-//var z = document.getElementsByClassName("legend-title");
-//for (var i = 0; i < z.length; i++) {
-//    z[i].addEventListener("click", function() {
-//        console.log(this);
-//        var store_id = this.getAttribute("data-store");
-//        if (clicked) {
-//            select_store_graph(store_id);
-//            clicked = false;
-//        } else {
-//            deselect_store_graph(store_id);
-//            clicked = true;
-//        }
-//    });
-//}
-
-document.addEventListener("click", function(){
-    d3.select("#refresh").on("click", update_graphs);
-    console.log("loaded");
-    d3.selectAll(".legend-title").on("click", function() {
-        var store_id = this.getAttribute("data-store");
-        var has_active_class = this.classList.contains("active");
-        if (!has_active_class) {
-            var x = document.getElementsByClassName("active");
-            for(var i = 0; i < x.length; i++){
-                x[i].classList.remove("active");
-            }
-            this.classList.add("active");
-            //console.log("this element does not contains class active");
-            select_store_graph(store_id);
-        } else if(has_active_class){
-            this.classList.remove("active");
-            //console.log("class active has been remved from this element");
-            deselect_store_graph();
+function mouseout() {
+    this.classList.remove("legend-item-focused");
+    d3.selectAll(".legend-item").filter(function(){
+        // Check if current element is hidden
+        if(d3.select(this).classed("transparent")){
+            d3.select(this)
+                .classed("transparent", false);
+            d3.selectAll(".graph")
+                .classed("transparent", false);
         }
     });
-});
+}
 
-window.onload = function() {
-    d3.select("#refresh").on("click", update_graphs);
-    console.log("loaded");
-    d3.selectAll(".legend-title").on("click", function() {
-        var store_id = this.getAttribute("data-store");
-        var has_active_class = this.classList.contains("active");
-        if (!has_active_class) {
-            var x = document.getElementsByClassName("active");
-            for(var i = 0; i < x.length; i++){
-                x[i].classList.remove("active");
-            }
-            this.classList.add("active");
-            //console.log("this element does not contains class active");
-            select_store_graph(store_id);
-        } else if(has_active_class){
-            this.classList.remove("active");
-            //console.log("class active has been remved from this element");
-            deselect_store_graph();
-        }
-    });
-};
+function click_function() {
+    var graph_id = this.getAttribute("data-store");
+    //console.log(graph_id);
+    var hidden = this.classList.contains("legend-item-hidden");
+    if (!hidden) {
+        this.classList.add("legend-item-hidden");
+        this.classList.remove("legend-item-focused");
+        hide_graph(graph_id);
+    } else if (hidden) {
+        this.classList.remove("legend-item-hidden");
+        show_graph(graph_id);
+        // Currently not working
+        //hover(this);
+    }
+}
+
