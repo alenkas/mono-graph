@@ -29,3 +29,4 @@ refactoring:
   ✔ on update tooltip shows incorrect data @done (16-05-17 16:28)
   ✔ after update x and y axis are above lines @done (16-05-17 16:28)
   ☐ check in all browsers
+  ☐ rewrite dublicated attributes as objects

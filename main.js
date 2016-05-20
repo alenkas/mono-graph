@@ -30,6 +30,9 @@ var x = d3.time.scale().range([0, width]);
 var y = d3.scale.linear()
     .range([height, 0]);
 
+var y1 = d3.scale.linear()
+    .range([height, 0]);
+
 var color = d3.scale.category10();
 
 // Define the axes
@@ -38,6 +41,9 @@ var xAxis = d3.svg.axis().scale(x)
 
 var yAxis = d3.svg.axis().scale(y)
     .orient("left").ticks(3);
+
+var yAxisSum = d3.svg.axis().scale(y1)
+    .orient("left").ticks(5);
 
 // Define the line for store
 var valueline = d3.svg.line()
@@ -54,7 +60,7 @@ var valueline_sum = d3.svg.line()
         return x(d.datetime);
     })
     .y(function (d) {
-        return y(d.value);
+        return y1(d.value);
     });
 
 // Create SVG element
@@ -77,13 +83,19 @@ var svgElement = document.getElementsByClassName("chart");
 var svgElementPosition = svgElement[0].getBoundingClientRect();
 console.log(svgElementPosition);
 
+var sumElement = document.getElementsByClassName("sum");
+var sumElementPosition = sumElement[0].getBoundingClientRect();
+console.log(sumElementPosition);
+
 var tooltip = d3.select("#tooltip")
+    .attr("class", "tooltip")
     .style("left", svgElementPosition.left + margin.left * 1.5 + "px")
     .style("top", svgElementPosition.top + margin.top * 1.5 + "px")
     .style("display", "none");
 
-var legend = d3.select("#legend");
-legend.style("margin-top", margin.top + "px");
+var legend = d3.select("#legend")
+    .attr("class", "legend")
+    .style("margin-top", margin.top + "px");
 
 function make_x_axis() {
     return d3.svg.axis()
@@ -99,10 +111,21 @@ function make_y_axis() {
         .ticks(5);
 }
 
+function make_y_axis_sum() {
+    return d3.svg.axis()
+        .scale(y1)
+        .orient("left")
+        .ticks(5);
+}
+
 //not sure if it's used
 //var lineSvg = svg.append("g");
 
 var focus = svg.append("g")
+    .attr("class", "hover")
+    .style("display", "none");
+
+var focus_sum = sum.append("g")
     .attr("class", "hover")
     .style("display", "none");
 
@@ -144,6 +167,7 @@ d3.json(url, function (error, data) {
         })
     ]);
 
+
     // Draw horizontal lines
     svg.append("g")
         .attr("class", "x grid")
@@ -161,22 +185,6 @@ d3.json(url, function (error, data) {
             .tickFormat("")
     );
 
-    // Draw horizontal lines
-    sum.append("g")
-        .attr("class", "x grid")
-        .attr("transform", "translate(0," + height + ")")
-        .call(make_x_axis()
-            .tickSize(-height, 0, 0)
-            .tickFormat("")
-    );
-
-    // Draw vertical lines
-    sum.append("g")
-        .attr("class", "y grid")
-        .call(make_y_axis()
-            .tickSize(-width, 0, 0)
-            .tickFormat("")
-    );
 
     // Add the X Axis
     svg.append("g")
@@ -185,26 +193,13 @@ d3.json(url, function (error, data) {
         .call(xAxis)
         .selectAll("text")
         .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", ".15em")
+        .attr({
+            "dx": "-.8em",
+            "dy": ".15em"
+        })
         .attr("transform", "rotate(-45)");
     // Add the Y Axis
     svg.append("g")
-        .attr("class", "y axis")
-        .call(yAxis);
-
-    // Add the X Axis
-    sum.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
-        .selectAll("text")
-        .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", ".15em")
-        .attr("transform", "rotate(-45)");
-    // Add the Y Axis
-    sum.append("g")
         .attr("class", "y axis")
         .call(yAxis);
 
@@ -227,38 +222,6 @@ d3.json(url, function (error, data) {
             return color(d.name);
         });
 
-    var store_sum = sum.append("g")
-        .data(stores)
-        .attr("class", "graph")
-        .attr("id", "overall");
-
-    // Add the valueline path for stores.
-    store_sum.append("path")
-        .attr("class", "line")
-        .attr("fill", "none")
-        .attr("d", function (d) {
-            //console.log(data[0].datetime);
-            var number = [];;
-            for (var i = 0; i < stores[0].values.length; i++){
-                number.push({
-                    datetime: data[i].datetime,
-                    value: 0
-                });
-            }
-            for(var i = 0; i < stores.length; i++){
-                //console.log(stores[i]);
-                for(var j = 0; j < stores[i].values.length; j++){
-                    //console.log(stores[i].values[j].store);
-                    //console.log(number[j]);
-                    number[j].value += parseInt(stores[i].values[j].store);
-                    //console.log(number[j], stores[i].values[j].store);
-                }
-            }
-            //console.log(number);
-            return valueline_sum(number);
-        })
-        .style("stroke", "#000");
-
     legend.append("div")
         .attr("id", "legend-title")
         .text("Stores")
@@ -270,7 +233,7 @@ d3.json(url, function (error, data) {
     var legend_section = legend.selectAll(".legend-item")
         .data(stores)
         .enter().append("div")
-        .attr("class", function(d){
+        .attr("class", function (d) {
             return "legend-item " + "legend-item-" + d.name;
         })
         .attr("width", width / 4)
@@ -443,6 +406,224 @@ d3.json(url, function (error, data) {
                 return value;
             });
     }
+
+    // ------------------------------------------------------------------------------
+
+    // Overall graph
+
+    // This one for counting overall users
+    var count_sum = function () {
+        var number = [];
+        // Fill array with zero values
+        for (var k = 0; k < stores[0].values.length; k++) {
+            number.push({
+                datetime: data[k].datetime,
+                value: 0
+            });
+        }
+        // Overwrite array values with new ones
+        for (var i = 0; i < stores.length; i++) {
+            for (var j = 0; j < stores[i].values.length; j++) {
+                number[j].value += parseInt(stores[i].values[j].store);
+            }
+        }
+        return number;
+    };
+
+    y1.domain([
+        d3.min(count_sum(), function (d) {
+            return Math.min(d.value);
+        }),
+        d3.max(count_sum(), function (d) {
+            return Math.max(d.value);
+        })
+    ]);
+
+
+    // Draw horizontal lines
+    sum.append("g")
+        .attr("class", "x grid")
+        .attr("transform", "translate(0," + height + ")")
+        .call(make_x_axis()
+            .tickSize(-height, 0, 0)
+            .tickFormat("")
+    );
+
+    // Draw vertical lines
+    sum.append("g")
+        .attr("class", "y grid")
+        .call(make_y_axis_sum()
+            .tickSize(-width, 0, 0)
+            .tickFormat("")
+    );
+
+    // Add the X Axis
+    sum.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr({
+            "dx": "-.8em",
+            "dy": ".15em"
+        })
+        .attr("transform", "rotate(-45)");
+    // Add the Y Axis
+    sum.append("g")
+        .attr("class", "y axis")
+        .call(yAxisSum);
+
+    var store_sum = sum.append("g")
+        .data(stores)
+        .attr("class", "graph sum")
+        .attr("id", "overall");
+
+    // Add the valueline path for stores.
+    store_sum.append("path")
+        .attr("class", "line")
+        .attr("fill", "none")
+        .attr("d", function () {
+            return valueline_sum(count_sum());
+        })
+        .style("stroke", "#000");
+
+    var legend_sum = d3.select("#legend_sum")
+        .attr("class", "legend")
+        .style("margin-top", margin.top + "px");
+
+    legend_sum.append("div")
+        .attr("id", "legend-title")
+        .text("Stores overall")
+        .append("span")
+        .attr("id", "refresh")
+        .attr("class", "ui-icon ui-icon-arrowrefresh-1-e")
+        .on("click", update_graphs);
+
+    var legend_section_sum = legend_sum.append("div")
+        .attr("class", "legend-item")
+        .attr("width", width / 4)
+        .attr("height", height / 4)
+        .on("click", click_function)
+        .on("mouseover", hover)
+        .on("mouseout", mouseout);
+
+    legend_section_sum.append("div")
+        .attr("class", "legend-swatch")
+        .style("background-color", "#000");
+
+    legend_section_sum.append("div")
+        .attr("class", "legend-title")
+        .text("Sum");
+
+    var tooltip_sum = d3.select("#tooltip_sum");
+
+    tooltip_sum.attr("class", "tooltip")
+        .style("display", "none")
+        .style("left", sumElementPosition.left + margin.left * 1.5 + "px")
+        .style("top", sumElementPosition.top + margin.top * 1.5 + "px")
+        .append("div")
+        .attr("id", "tooltip-title")
+        .style("font-weight", "bold")
+        .text("Sum");
+
+    var tooltip_section_sum = tooltip_sum.append("div")
+        .data(count_sum())
+        .attr("class", "tooltip-section");
+
+    tooltip_section_sum.append("div")
+        .attr("class", "tooltip-swatch")
+        .style("background-color", "#000");
+
+    tooltip_section_sum.append("div")
+        .attr("class", "tooltip-title")
+        .attr("title", "Sum")
+        .text("Sum");
+
+    tooltip_section_sum.append("div")
+        .attr("class", "tooltip-value")
+        .text(function () {
+            // return last value
+            return count_sum()[count_sum().length - 1].value;
+        });
+
+    // append the x line
+    focus_sum.append("line")
+        .data(count_sum())
+        .attr("class", "x")
+        .style("stroke", "#1B1B1B")
+        .style("stroke-dasharray", "3,3")
+        .style("opacity", 0.5)
+        .attr("y1", 0)
+        .attr("y2", height);
+
+    // append the circle at the intersection
+    focus_sum.append("circle")
+        .data(count_sum())
+        .attr("class", "sum")
+        .style("fill", "#FFFFFF")
+        .style("stroke", "#000")
+        .attr("r", 4);
+
+    // append the rectangle to capture mouse
+    sum.append("rect")
+        .data(count_sum())
+        .attr("width", width)
+        .attr("height", height)
+        .attr("class", "rect-capture-mouse")
+        .style("fill", "none")
+        .style("pointer-events", "all")
+        .on("mouseover", function () {
+            tooltip_sum.style("display", null);
+            focus_sum.style("display", null);
+            //console.log(tooltip_sum);
+        })
+        .on("mouseout", function () {
+            tooltip_sum.style("display", "none");
+            focus_sum.style("display", "none");
+        })
+        .on("mousemove", mousemove_sum);
+
+    function mousemove_sum() {
+        console.log(d);
+        var x0 = x.invert(d3.mouse(this)[0]),
+            i = bisectDate(count_sum(), x0, 1),
+            d0 = count_sum()[i - 1],
+            d1 = count_sum()[i],
+            d = x0 - d0.datetime > d1.datetime - x0 ? d1 : d0;
+
+        focus_sum.select("circle.sum")
+            .attr("value", d.value)
+            .attr("transform",
+            "translate(" + x(d.datetime) + "," +
+            y1(d.value) + ")");
+
+        focus_sum.select(".x")
+            .attr("transform",
+            "translate(" + x(d.datetime) + "," +
+            0 + ")")
+            .attr("y2", height);
+
+        focus_sum.select(".y")
+            .attr("transform",
+            "translate(" + width * -1 + "," +
+            y1(d.value) + ")")
+            .attr("x2", width + width);
+
+        tooltip_sum.select("#tooltip-title")
+            .text(function () {
+                var month_number = d.datetime.getMonth();
+                var date = d.datetime.getDate() + " " + get_month(month_number) + " " + (d.datetime.getFullYear() + 1);
+                return date;
+            });
+
+        tooltip_sum.selectAll(".tooltip-value")
+            .data(count_sum())
+            .text(function () {
+                var value = d3.select("circle.sum").attr("value");
+                return value;
+            });
+    }
 });
 
 function update_graphs() {
@@ -602,12 +783,12 @@ function update_graphs() {
     });
 }
 
-function hide_element(){
+function hide_element() {
     var element_classes = d3.select(this).attr("class");
     return element_classes + " hidden";
 }
 
-function transparent_element(){
+function transparent_element() {
     var element_classes = d3.select(this).attr("class");
     return element_classes + " transparent";
 }
@@ -615,18 +796,18 @@ function transparent_element(){
 function hide_graph(graph_id) {
     d3.selectAll("#" + graph_id + ", circle." + graph_id + ", .tooltip-section." + graph_id)
         .attr("class", hide_element);
-    d3.selectAll(".legend-item").filter(function(){
-       if(!d3.select(this).classed("legend-item-hidden")){
-           //console.log(true);
-           d3.select(this)
-               .classed("transparent", false);
-           d3.selectAll(".graph").filter(function(){
-               if(!d3.select(this).classed("hidden")){
-                   d3.select(this)
-                       .classed("transparent", false);
-               }
-           });
-       }
+    d3.selectAll(".legend-item").filter(function () {
+        if (!d3.select(this).classed("legend-item-hidden")) {
+            //console.log(true);
+            d3.select(this)
+                .classed("transparent", false);
+            d3.selectAll(".graph").filter(function () {
+                if (!d3.select(this).classed("hidden")) {
+                    d3.select(this)
+                        .classed("transparent", false);
+                }
+            });
+        }
     });
 }
 
@@ -641,23 +822,23 @@ function hover() {
     var focused = this.classList.contains("legend-item-focused");
     var hidden = this.classList.contains("legend-item-hidden");
 
-    if(!hidden){
+    if (!hidden) {
         this.classList.add("legend-item-focused");
     }
 
-    d3.selectAll(".legend-item").filter(function(){
+    d3.selectAll(".legend-item").filter(function () {
         // Check if current element is hidden
-        if(!d3.select(this).classed("transparent")){
+        if (!d3.select(this).classed("transparent")) {
             //console.log(false);
             //console.log(d3.select(this));
-            if(hidden){
+            if (hidden) {
                 //console.log(true);
-            } else if(!d3.select(this).classed("legend-item-focused")){
+            } else if (!d3.select(this).classed("legend-item-focused")) {
                 //console.log(d3.select(this));
                 d3.select(this)
                     .attr("class", transparent_element);
-                d3.selectAll(".graph").filter(function() {
-                    if(d3.select(this).attr("id") != graph_id){
+                d3.selectAll(".graph").filter(function () {
+                    if (d3.select(this).attr("id") != graph_id) {
                         //console.log(true);
                         d3.select(this)
                             .attr("class", transparent_element);
@@ -672,9 +853,9 @@ function hover() {
 
 function mouseout() {
     this.classList.remove("legend-item-focused");
-    d3.selectAll(".legend-item").filter(function(){
+    d3.selectAll(".legend-item").filter(function () {
         // Check if current element is hidden
-        if(d3.select(this).classed("transparent")){
+        if (d3.select(this).classed("transparent")) {
             d3.select(this)
                 .classed("transparent", false);
             d3.selectAll(".graph")

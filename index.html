@@ -34,8 +34,8 @@
             stroke-width: 0;
         }
 
-        #tooltip,
-        #legend {
+        .tooltip,
+        .legend {
             width: auto;
             height: auto;
             padding: 10px;
@@ -46,33 +46,33 @@
             box-shadow: 4px 4px 4px -3px rgba(0, 0, 0, 0.4);
         }
 
-        #tooltip {
+        .tooltip {
             position: absolute;
             pointer-events: none;
         }
 
-        #legend {
+        .legend {
             display: inline-block;
             vertical-align: top;
         }
 
-        #tooltip .tooltip-section div,
-        #legend .legend-item div {
+        .tooltip .tooltip-section div,
+        .legend .legend-item div {
             display: inline-block;
             margin-right: 4px;
         }
 
-        #tooltip .tooltip-section .tooltip-swatch,
-        #legend .legend-item .legend-swatch {
+        .tooltip .tooltip-section .tooltip-swatch,
+        .legend .legend-item .legend-swatch {
             width: 10px;
             height: 10px;
         }
 
-        #tooltip .tooltip-section .tooltip-title {
+        .tooltip .tooltip-section .tooltip-title {
             width: 90px;
         }
 
-        #tooltip .tooltip-section .tooltip-value {
+        .tooltip .tooltip-section .tooltip-value {
             width: 20px;
         }
 
@@ -99,15 +99,13 @@
 
 <body>
 <div>
-    <!--<div id="controls">-->
-        <!--<button id="week">week</button>-->
-        <!--<button id="month">month</button>-->
-    <!--</div>-->
     <svg class="chart"></svg>
     <div id="tooltip"></div>
     <div id="legend"></div>
 
     <svg class="sum"></svg>
+    <div id="tooltip_sum"></div>
+    <div id="legend_sum"></div>
 </div>
 <script src="main.js"></script>
 </body>
