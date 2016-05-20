@@ -39,3 +39,5 @@ refactoring:
   ☐ rewrite dublicated attributes as objects
   ☐ for functions like hover write selection that will work no matter which graph chart is focused right now
   ☐ maybe filter function is not the best choice, perhaps, .each?
+  ☐ isSelected = d3.select( g).classed( "selected");
+  ☐ Selection by store class is temporary decision. Think about better selection. In this case there is need to add new extra classes.

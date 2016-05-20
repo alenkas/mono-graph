@@ -235,7 +235,7 @@ d3.json(url, function (error, data) {
         .data(stores)
         .enter().append("div")
         .attr("class", function (d) {
-            return "legend-item " + "legend-item-" + d.name;
+            return "legend-item " + "legend-item-" + d.name + " store";
         })
         .attr("width", width / 4)
         .attr("height", height / 4)
@@ -477,7 +477,7 @@ d3.json(url, function (error, data) {
 
     var store_sum = sum.append("g")
         .data(stores)
-        .attr("class", "graph sum")
+        .attr("class", "graph-sum")
         .attr("id", "overall");
 
     // Add the valueline path for stores.
@@ -819,16 +819,11 @@ function hover() {
     var focused = this.classList.contains("legend-item-focused");
     var hidden = this.classList.contains("legend-item-hidden");
 
-    d3.selectAll(".legend-item").each(function(d,i){
-        console.log(this);
-        var children = d3.selectAll(this.childNodes)
-        console.log(children);
-    });
-
     if (!hidden) {
         this.classList.add("legend-item-focused");
     }
-    d3.selectAll(".legend-item").filter(function () {
+    // Selection by store class is temporary decision
+    d3.selectAll(".legend-item.store").filter(function () {
         // Check if current element is hidden
         if (!d3.select(this).classed("transparent")) {
             //console.log(false);
