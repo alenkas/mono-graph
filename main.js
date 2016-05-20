@@ -64,8 +64,9 @@ var valueline_sum = d3.svg.line()
     });
 
 // Create SVG element
-var svg = d3.select(".chart")
-    .attr("width", width + margin.left + margin.right)
+var svg = d3.select(".chart");
+
+svg.attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -503,10 +504,10 @@ d3.json(url, function (error, data) {
     var legend_section_sum = legend_sum.append("div")
         .attr("class", "legend-item")
         .attr("width", width / 4)
-        .attr("height", height / 4)
-        .on("click", click_function)
-        .on("mouseover", hover)
-        .on("mouseout", mouseout);
+        .attr("height", height / 4);
+        //.on("click", click_function)
+        //.on("mouseover", hover)
+        //.on("mouseout", mouseout);
 
     legend_section_sum.append("div")
         .attr("class", "legend-swatch")
@@ -585,7 +586,6 @@ d3.json(url, function (error, data) {
         .on("mousemove", mousemove_sum);
 
     function mousemove_sum() {
-        console.log(d);
         var x0 = x.invert(d3.mouse(this)[0]),
             i = bisectDate(count_sum(), x0, 1),
             d0 = count_sum()[i - 1],
@@ -783,19 +783,14 @@ function update_graphs() {
     });
 }
 
-function hide_element() {
-    var element_classes = d3.select(this).attr("class");
-    return element_classes + " hidden";
-}
-
-function transparent_element() {
-    var element_classes = d3.select(this).attr("class");
-    return element_classes + " transparent";
-}
-
 function hide_graph(graph_id) {
+
     d3.selectAll("#" + graph_id + ", circle." + graph_id + ", .tooltip-section." + graph_id)
-        .attr("class", hide_element);
+        .classed("hidden", true);
+
+    //d3.selectAll("#" + graph_id + ", circle." + graph_id + ", .tooltip-section." + graph_id)
+    //    .attr("class", hide_element);
+
     d3.selectAll(".legend-item").filter(function () {
         if (!d3.select(this).classed("legend-item-hidden")) {
             //console.log(true);
@@ -817,15 +812,22 @@ function show_graph(graph_id) {
 }
 
 function hover() {
+
+    var svg = d3.select(".chart");
     var graph_id = this.getAttribute("data-store");
     var transparent = this.classList.contains("transparent");
     var focused = this.classList.contains("legend-item-focused");
     var hidden = this.classList.contains("legend-item-hidden");
 
+    d3.selectAll(".legend-item").each(function(d,i){
+        console.log(this);
+        var children = d3.selectAll(this.childNodes)
+        console.log(children);
+    });
+
     if (!hidden) {
         this.classList.add("legend-item-focused");
     }
-
     d3.selectAll(".legend-item").filter(function () {
         // Check if current element is hidden
         if (!d3.select(this).classed("transparent")) {
@@ -836,12 +838,12 @@ function hover() {
             } else if (!d3.select(this).classed("legend-item-focused")) {
                 //console.log(d3.select(this));
                 d3.select(this)
-                    .attr("class", transparent_element);
+                    .classed("transparent", true);
                 d3.selectAll(".graph").filter(function () {
                     if (d3.select(this).attr("id") != graph_id) {
                         //console.log(true);
                         d3.select(this)
-                            .attr("class", transparent_element);
+                            .classed("transparent", true);
                     }
                 });
             }

@@ -6,6 +6,7 @@ chart:
   ✔ on hover show lines to x and y axis @done (16-05-16 13:08)
   ☐ add buttons to choose period on which to show graph (weeks, months, etc)
   ✔ on graph update also update last store values @done (16-05-13 13:39)
+  ☐ redraw y axis when deselecting graphs
 
 axis:
   ✔ x axis should show day interval @done (16-05-13 14:45)
@@ -17,7 +18,13 @@ bugs:
   ✔ on update x axis moves @done (16-05-13 13:42)
   ✔ on hover over first two dots difference between values is not calculated. it shows infinity or NaN. @done (16-05-13 15:00)
   ✔ store names stay on their places on update @done (16-05-16 18:59) this feature was removed
-  ☐ getBoundingClientRect not always working right, sometimes tooltip position is not correct
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+  ☐ getBoundingClientRect not always working right, sometimes tooltip position is not correct 
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
   ✔ after selecting single graph dots for hidden graphs also seen @done (16-05-18 15:25)
   ✔ after update tooltip values are shown incorrectly @done (16-05-18 15:25)
   ✔ on graph hover if one graph is select tooltip shows data for each graph, not for the selected one @done (16-05-18 15:32)
@@ -30,3 +37,5 @@ refactoring:
   ✔ after update x and y axis are above lines @done (16-05-17 16:28)
   ☐ check in all browsers
   ☐ rewrite dublicated attributes as objects
+  ☐ for functions like hover write selection that will work no matter which graph chart is focused right now
+  ☐ maybe filter function is not the best choice, perhaps, .each?
