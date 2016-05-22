@@ -88,11 +88,13 @@ var sumElement = document.getElementsByClassName("sum");
 var sumElementPosition = sumElement[0].getBoundingClientRect();
 console.log(sumElementPosition);
 
+console.log(svgElement.offsetTop, document.body.scrollTop);
+
 var tooltip = d3.select("#tooltip")
     .attr("class", "tooltip")
-    .style("left", svgElementPosition.left + margin.left * 1.5 + "px")
-    .style("top", svgElementPosition.top + margin.top * 1.5 + "px")
-    .style("display", "none");
+    .style("left", svgElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px")
+    .style("top", svgElementPosition.top + document.body.scrollTop + margin.top * 1.5 + "px");
+    //.style("display", "none");
 
 var legend = d3.select("#legend")
     .attr("class", "legend")
@@ -265,6 +267,11 @@ d3.json(url, function (error, data) {
         .attr("id", "tooltip-title")
         .style("font-weight", "bold")
         .text("Stores");
+
+    tooltip.on("resize", function(){
+        console.log("tootlip");
+        return d3.select(this).style("top", svgElementPosition.top + document.body.scrollTop + margin.top * 1.5);
+    });
 
     var tooltip_section = tooltip.selectAll(".graph")
         .data(stores)
@@ -520,9 +527,9 @@ d3.json(url, function (error, data) {
     var tooltip_sum = d3.select("#tooltip_sum");
 
     tooltip_sum.attr("class", "tooltip")
-        .style("display", "none")
-        .style("left", sumElementPosition.left + margin.left * 1.5 + "px")
-        .style("top", sumElementPosition.top + margin.top * 1.5 + "px")
+        //.style("display", "none")
+        .style("left", sumElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px")
+        .style("top", sumElementPosition.top + document.body.scrollTop + margin.top * 2 + "px")
         .append("div")
         .attr("id", "tooltip-title")
         .style("font-weight", "bold")
@@ -877,3 +884,17 @@ function click_function() {
     }
 }
 
+d3.select(window).on("resize", resize);
+
+function resize(){
+    svgElementPosition = svgElement[0].getBoundingClientRect();
+    sumElementPosition = sumElement[0].getBoundingClientRect();
+
+    d3.select("#tooltip")
+        .style("left", svgElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px")
+        .style("top", svgElementPosition.top + document.body.scrollTop + margin.top * 1.5 + "px");
+    d3.select("#tooltip_sum")
+        .style("left", sumElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px")
+        .style("top", sumElementPosition.top + document.body.scrollTop + margin.top * 2 + "px");
+
+}
