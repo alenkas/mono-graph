@@ -10,7 +10,7 @@ chart:
 
 axis:
   ✔ x axis should show day interval @done (16-05-13 14:45)
-  ☐ on y axis huge numbers should be written like 1k,10k, etc
+  ✔ on y axis huge numbers should be written like 1k,10k, etc @done (16-05-22 12:23)
 
 bugs:
   ✔ on update dots stay on their places @done (16-05-13 13:42)
@@ -29,6 +29,8 @@ bugs:
   ✔ after update tooltip values are shown incorrectly @done (16-05-18 15:25)
   ✔ on graph hover if one graph is select tooltip shows data for each graph, not for the selected one @done (16-05-18 15:32)
   ☐ after graph is back to visible state hover function is not working. line 622
+  ☐ huge numbers go off tooltip div.
+  
 
 refactoring: 
   ✔ too many identical function. in that book there is a chapter in the end that says how to color different lines better @done (16-05-13 13:13)

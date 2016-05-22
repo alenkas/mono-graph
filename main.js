@@ -3,7 +3,7 @@ var margin = {
         top: 30,
         right: 30,
         bottom: 50,
-        left: 30
+        left: 50
     },
     width = 650 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom;
@@ -40,10 +40,10 @@ var xAxis = d3.svg.axis().scale(x)
     .orient("bottom").ticks(d3.time.days, 1).tickFormat(d3.time.format("%d %b"));
 
 var yAxis = d3.svg.axis().scale(y)
-    .orient("left").ticks(3);
+    .orient("left").ticks(3).tickFormat(d3.format("s"));
 
 var yAxisSum = d3.svg.axis().scale(y1)
-    .orient("left").ticks(5);
+    .orient("left").ticks(5).tickFormat(d3.format("s"));
 
 // Define the line for store
 var valueline = d3.svg.line()
@@ -64,9 +64,8 @@ var valueline_sum = d3.svg.line()
     });
 
 // Create SVG element
-var svg = d3.select(".chart");
-
-svg.attr("width", width + margin.left + margin.right)
+var svg = d3.select(".chart")
+    .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -78,8 +77,6 @@ var sum = d3.select(".sum")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-//console.log(width, height, margin.left, margin.top);
-
 var svgElement = document.getElementsByClassName("chart");
 var svgElementPosition = svgElement[0].getBoundingClientRect();
 console.log(svgElementPosition);
@@ -88,13 +85,11 @@ var sumElement = document.getElementsByClassName("sum");
 var sumElementPosition = sumElement[0].getBoundingClientRect();
 console.log(sumElementPosition);
 
-console.log(svgElement.offsetTop, document.body.scrollTop);
-
 var tooltip = d3.select("#tooltip")
     .attr("class", "tooltip")
     .style("left", svgElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px")
-    .style("top", svgElementPosition.top + document.body.scrollTop + margin.top * 1.5 + "px");
-    //.style("display", "none");
+    .style("top", svgElementPosition.top + document.body.scrollTop + margin.top * 1.5 + "px")
+    .style("display", "none");
 
 var legend = d3.select("#legend")
     .attr("class", "legend")
@@ -196,10 +191,8 @@ d3.json(url, function (error, data) {
         .call(xAxis)
         .selectAll("text")
         .style("text-anchor", "end")
-        .attr({
-            "dx": "-.8em",
-            "dy": ".15em"
-        })
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
         .attr("transform", "rotate(-45)");
     // Add the Y Axis
     svg.append("g")
@@ -527,13 +520,15 @@ d3.json(url, function (error, data) {
     var tooltip_sum = d3.select("#tooltip_sum");
 
     tooltip_sum.attr("class", "tooltip")
-        //.style("display", "none")
+        .style("display", "none")
         .style("left", sumElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px")
         .style("top", sumElementPosition.top + document.body.scrollTop + margin.top * 2 + "px")
         .append("div")
         .attr("id", "tooltip-title")
         .style("font-weight", "bold")
         .text("Sum");
+
+    console.log(sumElementPosition.top + " " + document.body.scrollTop + " " + margin.top * 2);
 
     var tooltip_section_sum = tooltip_sum.append("div")
         .data(count_sum())
