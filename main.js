@@ -26,6 +26,9 @@ var parseDate = d3.time.format("%Y-%m-%d").parse,
         return d.datetime;
     }).left;
 
+// Format large numbers by putting commas
+var formatLargeNumbers = d3.format(",");
+
 var x = d3.time.scale().range([0, width]);
 var y = d3.scale.linear()
     .range([height, 0]);
@@ -87,9 +90,9 @@ console.log(sumElementPosition);
 
 var tooltip = d3.select("#tooltip")
     .attr("class", "tooltip")
+    //.style("display", "none")
     .style("left", svgElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px")
-    .style("top", svgElementPosition.top + document.body.scrollTop + margin.top * 1.5 + "px")
-    .style("display", "none");
+    .style("top", svgElementPosition.top + document.body.scrollTop + margin.top * 1.5 + "px");
 
 var legend = d3.select("#legend")
     .attr("class", "legend")
@@ -221,6 +224,7 @@ d3.json(url, function (error, data) {
     legend.append("div")
         .attr("id", "legend-title")
         .text("Stores")
+        .on("click", update_graphs)
         .append("span")
         .attr("id", "refresh")
         .attr("class", "ui-icon ui-icon-arrowrefresh-1-e")
@@ -261,11 +265,6 @@ d3.json(url, function (error, data) {
         .style("font-weight", "bold")
         .text("Stores");
 
-    tooltip.on("resize", function(){
-        console.log("tootlip");
-        return d3.select(this).style("top", svgElementPosition.top + document.body.scrollTop + margin.top * 1.5);
-    });
-
     var tooltip_section = tooltip.selectAll(".graph")
         .data(stores)
         .enter().append("div")
@@ -290,9 +289,12 @@ d3.json(url, function (error, data) {
 
     tooltip_section.append("div")
         .attr("class", "tooltip-value")
+        .style("color", function(d){
+            return color(d.name);
+        })
         .text(function (d) {
             // return last value
-            return d.values[d.values.length - 1].store;
+            return formatLargeNumbers(d.values[d.values.length - 1].store);
         });
 
 
@@ -404,7 +406,7 @@ d3.json(url, function (error, data) {
             .data(stores)
             .text(function (d) {
                 var value = d3.select("circle." + d.name).attr("value");
-                return value;
+                return formatLargeNumbers(value);
             });
     }
 
@@ -547,7 +549,7 @@ d3.json(url, function (error, data) {
         .attr("class", "tooltip-value")
         .text(function () {
             // return last value
-            return count_sum()[count_sum().length - 1].value;
+            return formatLargeNumbers(count_sum()[count_sum().length - 1].value);
         });
 
     // append the x line
@@ -623,7 +625,7 @@ d3.json(url, function (error, data) {
             .data(count_sum())
             .text(function () {
                 var value = d3.select("circle.sum").attr("value");
-                return value;
+                return formatLargeNumbers(value);
             });
     }
 });
@@ -761,7 +763,7 @@ function update_graphs() {
                 .data(stores)
                 .text(function (d) {
                     var value = d3.select("circle." + d.name).attr("value");
-                    return value;
+                    return formatLargeNumbers(value);
                 });
         }
 
@@ -782,6 +784,144 @@ function update_graphs() {
             //.duration(750)
             .call(yAxis);
 
+        //---------------------------
+
+        // Overall graph
+
+        // This one for counting overall users
+        var count_sum = function () {
+            var number = [];
+            // Fill array with zero values
+            for (var k = 0; k < stores[0].values.length; k++) {
+                number.push({
+                    datetime: data[k].datetime,
+                    value: 0
+                });
+            }
+            // Overwrite array values with new ones
+            for (var i = 0; i < stores.length; i++) {
+                for (var j = 0; j < stores[i].values.length; j++) {
+                    number[j].value += parseInt(stores[i].values[j].store);
+                }
+            }
+            return number;
+        };
+
+        y1.domain([
+            d3.min(count_sum(), function (d) {
+                return Math.min(d.value);
+            }),
+            d3.max(count_sum(), function (d) {
+                return Math.max(d.value);
+            })
+        ]);
+
+        // Select the section we want to apply our changes to
+        var sum = d3.select(".sum");
+
+        // Redraw vertical grid
+        sum.select(".grid.x")
+            .attr("transform", "translate(0," + height + ")")
+            .call(make_x_axis()
+                .tickSize(-height, 0, 0)
+                .tickFormat("")
+            );
+
+        //Redraw horizontal grid
+        sum.select(".grid.y")
+            //.attr("transform", "translate(0," + height + ")")
+            .call(make_y_axis_sum()
+                .tickSize(-width, 0, 0)
+                .tickFormat("")
+            );
+
+        var store_sum = sum.select(".graph-sum")
+            .data(count_sum());
+
+        store_sum.select("path")
+            .transition()
+            .duration(750)
+            .attr("d", function () {
+                return valueline_sum(count_sum());
+            })
+            .style("display", "inline");
+
+        var tooltip_sum = d3.select("#tooltip_sum");
+
+        //append the rectangle to capture mouse
+        sum.select(".rect-capture-mouse")
+            .data(count_sum())
+            .attr("width", width)
+            .attr("height", height)
+            //.attr("rect-capture-mouse")
+            .style("fill", "none")
+            .style("pointer-events", "all")
+            .on("mouseover", function () {
+                tooltip_sum.style("display", null);
+                focus_sum.style("display", null);
+            })
+            .on("mouseout", function () {
+                tooltip_sum.style("display", "none");
+                focus_sum.style("display", "none");
+            })
+            .on("mousemove", mousemove_sum);
+
+        function mousemove_sum() {
+            var x0 = x.invert(d3.mouse(this)[0]),
+                i = bisectDate(count_sum(), x0, 1),
+                d0 = count_sum()[i - 1],
+                d1 = count_sum()[i],
+                d = x0 - d0.datetime > d1.datetime - x0 ? d1 : d0;
+
+            focus_sum.select("circle.sum")
+                .attr("value", d.value)
+                .attr("transform",
+                    "translate(" + x(d.datetime) + "," +
+                    y1(d.value) + ")");
+
+            focus_sum.select(".x")
+                .attr("transform",
+                    "translate(" + x(d.datetime) + "," +
+                    0 + ")")
+                .attr("y2", height);
+
+            focus_sum.select(".y")
+                .attr("transform",
+                    "translate(" + width * -1 + "," +
+                    y1(d.value) + ")")
+                .attr("x2", width + width);
+
+            tooltip_sum.select("#tooltip-title")
+                .text(function () {
+                    var month_number = d.datetime.getMonth();
+                    var date = d.datetime.getDate() + " " + get_month(month_number) + " " + (d.datetime.getFullYear() + 1);
+                    return date;
+                });
+
+            tooltip_sum.select(".tooltip-value")
+                .data(count_sum())
+                .text(function (d) {
+                    var value = d3.select("circle.sum").attr("value");
+                    return formatLargeNumbers(value);
+                });
+        }
+
+        // update the x axis
+        sum.select(".x.axis")
+            //.duration(750)
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis)
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", "-.8em")
+            .attr("dy", ".15em")
+            .attr("transform", "rotate(-45)");
+
+        // update the y axis
+        sum.select(".y.axis")
+            //.duration(750)
+            .call(yAxisSum);
     });
 }
 
@@ -814,15 +954,22 @@ function show_graph(graph_id) {
 }
 
 function hover() {
+    console.log(this);
+    var element = d3.select(this);
 
-    var svg = d3.select(".chart");
+    //var graph_id = element.attr("data-store");
     var graph_id = this.getAttribute("data-store");
+
+    //var transparent = element.classed("transparent");
+    //var focused = element.classed("legend-item-focused");
+    //var hidden = element.classed("legend-item-hidden");
+
     var transparent = this.classList.contains("transparent");
     var focused = this.classList.contains("legend-item-focused");
     var hidden = this.classList.contains("legend-item-hidden");
 
     if (!hidden) {
-        this.classList.add("legend-item-focused");
+        element.classed("legend-item-focused", true);
     }
     // Selection by store class is temporary decision
     d3.selectAll(".legend-item.store").filter(function () {
@@ -864,18 +1011,22 @@ function mouseout() {
 }
 
 function click_function() {
-    var graph_id = this.getAttribute("data-store");
-    //console.log(graph_id);
-    var hidden = this.classList.contains("legend-item-hidden");
+    var element = d3.select(this);
+    var graph_id = element.attr("data-store");
+    var hidden = element.classed("legend-item-hidden");
+
     if (!hidden) {
-        this.classList.add("legend-item-hidden");
-        this.classList.remove("legend-item-focused");
+        element.classed({
+            "legend-item-hidden": true,
+            "legend-item-focused": false
+        });
         hide_graph(graph_id);
     } else if (hidden) {
-        this.classList.remove("legend-item-hidden");
+        element.classed({
+            "legend-item-hidden": false,
+            "legend-item-focused": true
+        }).call(hover);
         show_graph(graph_id);
-        // Currently not working
-        //hover(this);
     }
 }
 
