@@ -52,6 +52,8 @@
         }
 
         .legend {
+            min-width: 60px;
+            min-height: 60px;
             display: inline-block;
             vertical-align: top;
         }
@@ -100,13 +102,16 @@
 
 <body>
 <div>
-    <svg class="chart"></svg>
-    <div id="tooltip"></div>
-    <div id="legend"></div>
-
-    <svg class="sum"></svg>
-    <div id="tooltip_sum"></div>
-    <div id="legend_sum"></div>
+    <div>
+        <svg class="chart"></svg>
+        <div id="tooltip"></div>
+        <div id="legend"></div>
+    </div>
+    <div>
+        <svg class="sum"></svg>
+        <div id="tooltip_sum"></div>
+        <div id="legend_sum"></div>
+    </div>
 </div>
 <script src="main.js"></script>
 </body>

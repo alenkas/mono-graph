@@ -73,6 +73,20 @@ var svg = d3.select(".chart")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+var svgElement = document.getElementsByClassName("chart");
+var svgElementPosition = svgElement[0].getBoundingClientRect();
+console.log(svgElementPosition);
+
+var tooltip = d3.select("#tooltip")
+    .attr("class", "tooltip")
+    .style("display", "none")
+    .style("left", svgElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px")
+    .style("top", svgElementPosition.top + document.body.scrollTop + margin.top * 1.5 + "px");
+
+var legend = d3.select("#legend")
+    .attr("class", "legend")
+    .style("margin-top", margin.top + "px");
+
 // Create SVG element
 var sum = d3.select(".sum")
     .attr("width", width + margin.left + margin.right)
@@ -80,23 +94,9 @@ var sum = d3.select(".sum")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var svgElement = document.getElementsByClassName("chart");
-var svgElementPosition = svgElement[0].getBoundingClientRect();
-console.log(svgElementPosition);
-
 var sumElement = document.getElementsByClassName("sum");
 var sumElementPosition = sumElement[0].getBoundingClientRect();
 console.log(sumElementPosition);
-
-var tooltip = d3.select("#tooltip")
-    .attr("class", "tooltip")
-    //.style("display", "none")
-    .style("left", svgElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px")
-    .style("top", svgElementPosition.top + document.body.scrollTop + margin.top * 1.5 + "px");
-
-var legend = d3.select("#legend")
-    .attr("class", "legend")
-    .style("margin-top", margin.top + "px");
 
 function make_x_axis() {
     return d3.svg.axis()
@@ -289,7 +289,7 @@ d3.json(url, function (error, data) {
 
     tooltip_section.append("div")
         .attr("class", "tooltip-value")
-        .style("color", function(d){
+        .style("color", function (d) {
             return color(d.name);
         })
         .text(function (d) {
@@ -354,34 +354,17 @@ d3.json(url, function (error, data) {
             d1 = data[i],
             d = x0 - d0.datetime > d1.datetime - x0 ? d1 : d0;
 
-        //focus.selectAll("circle")
-        //    .data(stores)
-        //    .attr("value", function(d){
-        //        return d.name;
-        //    })
-        //    .attr("transform", function(d){
-        //        console.log(d.values, d.name, d);
-        //        return  "translate(" + x(d.datetime) + "," +
-        //            y(d.name) + ")";
-        //    });
-
-        focus.select("circle.fb")
-            .attr("value", d.fb)
-            .attr("transform",
-            "translate(" + x(d.datetime) + "," +
-            y(d.fb) + ")");
-
-        focus.select("circle.play")
-            .attr("value", d.play)
-            .attr("transform",
-            "translate(" + x(d.datetime) + "," +
-            y(d.play) + ")");
-
-        focus.select("circle.appstore")
-            .attr("value", d.appstore)
-            .attr("transform",
-            "translate(" + x(d.datetime) + "," +
-            y(d.appstore) + ")");
+        // Loop through object to fin each store value, append it to circles and
+        // set their transform attribute
+        for (var key in d) {
+            if (key != "datetime") {
+                focus.select("circle." + key)
+                    .attr("value", d[key])
+                    .attr("transform",
+                    "translate(" + x(d.datetime) + "," +
+                    y(d[key]) + ")");
+            }
+        }
 
         focus.select(".x")
             .attr("transform",
@@ -507,9 +490,9 @@ d3.json(url, function (error, data) {
         .attr("class", "legend-item")
         .attr("width", width / 4)
         .attr("height", height / 4);
-        //.on("click", click_function)
-        //.on("mouseover", hover)
-        //.on("mouseout", mouseout);
+    //.on("click", click_function)
+    //.on("mouseover", hover)
+    //.on("mouseout", mouseout);
 
     legend_section_sum.append("div")
         .attr("class", "legend-swatch")
@@ -722,23 +705,15 @@ function update_graphs() {
                 d1 = data[i],
                 d = x0 - d0.datetime > d1.datetime - x0 ? d1 : d0;
 
-            focus.select("circle.fb")
-                .attr("value", d.fb)
-                .attr("transform",
-                "translate(" + x(d.datetime) + "," +
-                y(d.fb) + ")");
-
-            focus.select("circle.play")
-                .attr("value", d.play)
-                .attr("transform",
-                "translate(" + x(d.datetime) + "," +
-                y(d.play) + ")");
-
-            focus.select("circle.appstore")
-                .attr("value", d.appstore)
-                .attr("transform",
-                "translate(" + x(d.datetime) + "," +
-                y(d.appstore) + ")");
+            for (var key in d) {
+                if (key != "datetime") {
+                    focus.select("circle." + key)
+                        .attr("value", d[key])
+                        .attr("transform",
+                        "translate(" + x(d.datetime) + "," +
+                        y(d[key]) + ")");
+                }
+            }
 
             focus.select(".x")
                 .attr("transform",
@@ -825,7 +800,7 @@ function update_graphs() {
             .call(make_x_axis()
                 .tickSize(-height, 0, 0)
                 .tickFormat("")
-            );
+        );
 
         //Redraw horizontal grid
         sum.select(".grid.y")
@@ -833,7 +808,7 @@ function update_graphs() {
             .call(make_y_axis_sum()
                 .tickSize(-width, 0, 0)
                 .tickFormat("")
-            );
+        );
 
         var store_sum = sum.select(".graph-sum")
             .data(count_sum());
@@ -876,19 +851,19 @@ function update_graphs() {
             focus_sum.select("circle.sum")
                 .attr("value", d.value)
                 .attr("transform",
-                    "translate(" + x(d.datetime) + "," +
-                    y1(d.value) + ")");
+                "translate(" + x(d.datetime) + "," +
+                y1(d.value) + ")");
 
             focus_sum.select(".x")
                 .attr("transform",
-                    "translate(" + x(d.datetime) + "," +
-                    0 + ")")
+                "translate(" + x(d.datetime) + "," +
+                0 + ")")
                 .attr("y2", height);
 
             focus_sum.select(".y")
                 .attr("transform",
-                    "translate(" + width * -1 + "," +
-                    y1(d.value) + ")")
+                "translate(" + width * -1 + "," +
+                y1(d.value) + ")")
                 .attr("x2", width + width);
 
             tooltip_sum.select("#tooltip-title")
@@ -954,7 +929,6 @@ function show_graph(graph_id) {
 }
 
 function hover() {
-    console.log(this);
     var element = d3.select(this);
 
     //var graph_id = element.attr("data-store");
@@ -1032,15 +1006,21 @@ function click_function() {
 
 d3.select(window).on("resize", resize);
 
-function resize(){
+function resize() {
     svgElementPosition = svgElement[0].getBoundingClientRect();
     sumElementPosition = sumElement[0].getBoundingClientRect();
+
+    //console.log(svgElementPosition);
+    //console.log(sumElementPosition);
 
     d3.select("#tooltip")
         .style("left", svgElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px")
         .style("top", svgElementPosition.top + document.body.scrollTop + margin.top * 1.5 + "px");
     d3.select("#tooltip_sum")
         .style("left", sumElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px")
-        .style("top", sumElementPosition.top + document.body.scrollTop + margin.top * 2 + "px");
+        .style("top", sumElementPosition.top + document.body.scrollTop + margin.top * 2 + "px")
+        .call(function () {
+            //console.log(sumElementPosition.top + " " + document.body.scrollTop + " " + margin.top * 2);
+        });
 
 }

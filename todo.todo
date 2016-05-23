@@ -18,23 +18,17 @@ bugs:
   ✔ on update x axis moves @done (16-05-13 13:42)
   ✔ on hover over first two dots difference between values is not calculated. it shows infinity or NaN. @done (16-05-13 15:00)
   ✔ store names stay on their places on update @done (16-05-16 18:59) this feature was removed
-
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-  ☐ getBoundingClientRect not always working right, sometimes tooltip position is not correct 
-
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+  ✔ getBoundingClientRect not always working right, sometimes tooltip position is not correct  @done (16-05-23 09:58)
   ✔ after selecting single graph dots for hidden graphs also seen @done (16-05-18 15:25)
   ✔ after update tooltip values are shown incorrectly @done (16-05-18 15:25)
   ✔ on graph hover if one graph is select tooltip shows data for each graph, not for the selected one @done (16-05-18 15:32)
   ☐ after graph is back to visible state hover function is not working. line 622
-  ☐ huge numbers go off tooltip div.
+  ✔ huge numbers go off tooltip div. @done (16-05-23 09:59)
   
 
 refactoring: 
   ✔ too many identical function. in that book there is a chapter in the end that says how to color different lines better @done (16-05-13 13:13)
-  ☐ showing circles and x line on hover works only for three lines, they are drawn not automatically
+  ✔ showing circles and x line on hover works only for three lines, they are drawn not automatically @done (16-05-23 10:24)
   ✔ on update tooltip shows incorrect data @done (16-05-17 16:28)
   ✔ after update x and y axis are above lines @done (16-05-17 16:28)
   ☐ check in all browsers
