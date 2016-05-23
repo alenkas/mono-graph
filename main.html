@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .x-axis, .y-axis path,
+        .x-axis line, .y-axis line {
+            fill: none;
+            stroke: black;
+            shape-rendering: crispEdges;
+        }
+        .x-axis text,.y-axis text {
+            font-family: sans-serif;
+            font-size: 10px;
+        }
+        h1 {
+            font-family: sans-serif;
+            font-weight: 300;
+            font-size: 16px;
+        }
+
+        div.tooltip {
+            position: absolute;
+            max-width:200px;
+            height:auto;
+            padding:5px;
+            background-color:white;
+            border-radius:5px;
+            box-shadow:4px 4px 10px rgba(0,0,0,0.5);
+            pointer-events:none; /*very important */
+            font-family: sans-serif;
+            font-size:12px;
+        }
+
+    </style>
+    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+</head>
+<body>
+<p>Choose Date Range
+    <select id="date-option">
+        <option value="12">Last Year</option>
+        <option value="6">Last 6 / mo</option>
+        <option value = "3">Last Quarter</option>
+    </select>
+</p>
+<script src="new.js"></script>
+</body>
+</html>

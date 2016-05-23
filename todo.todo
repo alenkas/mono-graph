@@ -4,7 +4,7 @@ chart:
   ✔ input checkboxes work async @done (16-05-13 08:56)
   ☐ ajax load
   ✔ on hover show lines to x and y axis @done (16-05-16 13:08)
-  ☐ add buttons to choose period on which to show graph (weeks, months, etc)
+  ✔ add buttons to choose period on which to show graph (weeks, months, etc) @done (16-05-23 19:59)
   ✔ on graph update also update last store values @done (16-05-13 13:39)
   ☐ redraw y axis when deselecting graphs
 
@@ -24,6 +24,11 @@ bugs:
   ✔ on graph hover if one graph is select tooltip shows data for each graph, not for the selected one @done (16-05-18 15:32)
   ✔ after graph is back to visible state hover function is not working. line 622 @done (16-05-23 15:06)
   ✔ huge numbers go off tooltip div. @done (16-05-23 09:59)
+  ☐ after switch to year view, y axis shows incorrect data, other graphs are not seen
+
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  ☐ after switch view path attr d is wrong
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
 
 refactoring: 
@@ -31,8 +36,8 @@ refactoring:
   ✔ showing circles and x line on hover works only for three lines, they are drawn not automatically @done (16-05-23 10:24)
   ✔ on update tooltip shows incorrect data @done (16-05-17 16:28)
   ✔ after update x and y axis are above lines @done (16-05-17 16:28)
-  ☐ check in all browsers
-  ☐ rewrite dublicated attributes as objects
+  ✔ check in all browsers @done (16-05-23 17:29) works except getBoundingClientRect, which currently doesn't work as expected anywhere
+  ✔ rewrite dublicated attributes as objects ? @done (16-05-23 17:48)
   ☐ for functions like hover write selection that will work no matter which graph chart is focused right now
   ☐ maybe filter function is not the best choice, perhaps, .each?
   ✔ isSelected = d3.select( g).classed( "selected"); @done (16-05-23 15:06)

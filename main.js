@@ -393,6 +393,27 @@ d3.json(url, function (error, data) {
             });
     }
 
+    d3.select("select")
+        //.data(stores)
+        .on("change", function (d, i) {
+            var stores = color.domain().map(function (name) {
+                return {
+                    name: name,
+                    values: data.map(function (d) {
+                        return {datetime: d.datetime, store: +d[name]};
+                    })
+                };
+            });
+
+            var sel = d3.select("#date-option").node().value;
+            console.log(stores);
+            stores.forEach(function (d) {
+                d.values.splice(0, d.values.length - sel);
+                updateLine(d, data);
+            });
+            console.log(stores);
+        });
+
     // ------------------------------------------------------------------------------
 
     // Overall graph
@@ -610,6 +631,141 @@ d3.json(url, function (error, data) {
             });
     }
 });
+
+function updateLine(d, data) {
+    console.log(d);
+    var minDate = d.values[0].datetime;
+    var maxDate = d.values[d.values.length - 1].datetime;
+
+    x.domain([minDate, maxDate]);
+
+    y.domain([
+        0,
+        d3.max(d.values, function (d) {
+            return d.store;
+        })
+    ]);
+
+    var xAxisGen = d3.svg.axis().scale(x)
+        .orient("bottom").tickFormat(d3.time.format("%d %b"))
+        .ticks(d.values.length - 1);
+    var yAxisGen = d3.svg.axis().scale(y)
+        .orient("left").ticks(4).tickFormat(d3.format("s"));
+
+    var valueline = d3.svg.line()
+        .x(function (d) {
+            return x(d.datetime);
+        })
+        .y(function (d) {
+            return y(d.store);
+        })
+        .interpolate("linear");
+
+    var svg = d3.select(".chart")
+        .attr({
+            width: width + margin.left + margin.right,
+            height: height + margin.top + margin.bottom
+        });
+
+    // Redraw vertical grid
+    svg.select(".grid.x")
+        .attr("transform", "translate(0," + height + ")")
+        .call(make_x_axis()
+            .tickSize(-height, 0, 0)
+            .tickFormat("")
+    );
+
+    //Redraw horizontal grid
+    svg.select(".grid.y")
+        .call(make_y_axis()
+            .tickSize(-width, 0, 0)
+            .tickFormat("")
+    );
+
+    var yAxis = svg.selectAll("g.y.axis").call(yAxisGen);
+
+    var xAxis = svg.selectAll("g.x.axis")
+        .call(xAxisGen)
+        .selectAll("text")
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", ".15em")
+        .attr("transform", "rotate(-45)");
+    //
+    var store = svg.selectAll("#" + d.name);
+
+    store.select("path")
+        .transition()
+        .duration(1000)
+        //.ease("bounce")
+        .attr("d", function () {
+            return valueline(d.values);
+        })
+        .style("display", "inline");
+
+    //append the rectangle to capture mouse
+    //svg.select(".rect-capture-mouse")
+    //    //.data(d.values)
+    //    .attr("width", width)
+    //    .attr("height", height)
+    //    //.attr("rect-capture-mouse")
+    //    .style("fill", "none")
+    //    .style("pointer-events", "all")
+    //    .on("mouseover", function () {
+    //        tooltip.style("display", null);
+    //        focus.style("display", null);
+    //    })
+    //    .on("mouseout", function () {
+    //        tooltip.style("display", "none");
+    //        focus.style("display", "none");
+    //    })
+    //    .on("mousemove", mousemove);
+    //
+    //function mousemove() {
+    //    var x0 = x.invert(d3.mouse(this)[0]),
+    //        i = bisectDate(data, x0, 1),
+    //        d0 = data[i - 1],
+    //        d1 = data[i],
+    //        d = x0 - d0.datetime > d1.datetime - x0 ? d1 : d0;
+    //
+    //    for (var key in d) {
+    //        if (key != "datetime") {
+    //            focus.select("circle." + key)
+    //                .attr("value", d[key])
+    //                .attr("transform",
+    //                "translate(" + x(d.datetime) + "," +
+    //                y(d[key]) + ")");
+    //        }
+    //    }
+    //
+    //    focus.select(".x")
+    //        .attr("transform",
+    //        "translate(" + x(d.datetime) + "," +
+    //        0 + ")")
+    //        .attr("y2", height);
+    //
+    //    focus.select(".y")
+    //        .attr("transform",
+    //        "translate(" + width * -1 + "," +
+    //        y(d.play) + ")")
+    //        .attr("x2", width + width);
+    //
+    //    tooltip.select("#tooltip-title")
+    //        .text(function () {
+    //            var month_number = d.datetime.getMonth();
+    //            var date = d.datetime.getDate() + " " + get_month(month_number) + " " + (d.datetime.getFullYear() + 1);
+    //            return date;
+    //        });
+    //
+    //    tooltip.selectAll(".tooltip-value")
+    //        //.data(d.values)
+    //        .text(function (d) {
+    //            var value = d3.select("circle." + d.name).attr("value");
+    //            return formatLargeNumbers(value);
+    //        });
+    //}
+
+}
 
 function update_graphs() {
     d3.json("data1.json", function (error, data) {
@@ -926,13 +1082,6 @@ function show_graph(graph_id) {
         .classed("hidden", false);
 }
 
-function graph_focused(){
-    console.log("focused");
-    var element = this;
-    console.log(this);
-    console.log(element.attr("data-store"));
-}
-
 function mouseover() {
     var element = d3.select(this);
     var graph_id = this.getAttribute("data-store");
@@ -996,8 +1145,8 @@ function click_function() {
             "legend-item-focused": true
         });
         show_graph(graph_id);
-        d3.selectAll(".legend-item.store").filter(function(){
-            if(!d3.select(this).classed("legend-item-focused")) {
+        d3.selectAll(".legend-item.store").filter(function () {
+            if (!d3.select(this).classed("legend-item-focused")) {
                 d3.select(this).classed("transparent", true);
                 d3.selectAll(".graph").filter(function () {
                     if (d3.select(this).attr("id") != graph_id) {
