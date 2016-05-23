@@ -242,7 +242,7 @@ d3.json(url, function (error, data) {
             return d.name;
         })
         .on("click", click_function)
-        .on("mouseover", hover)
+        .on("mouseover", mouseover)
         .on("mouseout", mouseout);
 
     legend_section.append("div")
@@ -491,7 +491,7 @@ d3.json(url, function (error, data) {
         .attr("width", width / 4)
         .attr("height", height / 4);
     //.on("click", click_function)
-    //.on("mouseover", hover)
+    //.on("mouseover", mouseover)
     //.on("mouseout", mouseout);
 
     legend_section_sum.append("div")
@@ -512,8 +512,6 @@ d3.json(url, function (error, data) {
         .attr("id", "tooltip-title")
         .style("font-weight", "bold")
         .text("Sum");
-
-    console.log(sumElementPosition.top + " " + document.body.scrollTop + " " + margin.top * 2);
 
     var tooltip_section_sum = tooltip_sum.append("div")
         .data(count_sum())
@@ -928,38 +926,37 @@ function show_graph(graph_id) {
         .classed("hidden", false);
 }
 
-function hover() {
-    var element = d3.select(this);
+function graph_focused(){
+    console.log("focused");
+    var element = this;
+    console.log(this);
+    console.log(element.attr("data-store"));
+}
 
-    //var graph_id = element.attr("data-store");
+function mouseover() {
+    var element = d3.select(this);
     var graph_id = this.getAttribute("data-store");
 
-    //var transparent = element.classed("transparent");
-    //var focused = element.classed("legend-item-focused");
-    //var hidden = element.classed("legend-item-hidden");
-
-    var transparent = this.classList.contains("transparent");
-    var focused = this.classList.contains("legend-item-focused");
-    var hidden = this.classList.contains("legend-item-hidden");
+    var transparent = element.classed("transparent");
+    var focused = element.classed("legend-item-focused");
+    var hidden = element.classed("legend-item-hidden");
 
     if (!hidden) {
         element.classed("legend-item-focused", true);
     }
+
     // Selection by store class is temporary decision
     d3.selectAll(".legend-item.store").filter(function () {
         // Check if current element is hidden
         if (!d3.select(this).classed("transparent")) {
-            //console.log(false);
-            //console.log(d3.select(this));
             if (hidden) {
+                //don't delete this. without it won't work if selection :(
                 //console.log(true);
             } else if (!d3.select(this).classed("legend-item-focused")) {
-                //console.log(d3.select(this));
                 d3.select(this)
                     .classed("transparent", true);
                 d3.selectAll(".graph").filter(function () {
                     if (d3.select(this).attr("id") != graph_id) {
-                        //console.log(true);
                         d3.select(this)
                             .classed("transparent", true);
                     }
@@ -967,12 +964,10 @@ function hover() {
             }
         }
     });
-
-
 }
 
 function mouseout() {
-    this.classList.remove("legend-item-focused");
+    d3.select(this).classed("legend-item-focused", false);
     d3.selectAll(".legend-item").filter(function () {
         // Check if current element is hidden
         if (d3.select(this).classed("transparent")) {
@@ -999,8 +994,19 @@ function click_function() {
         element.classed({
             "legend-item-hidden": false,
             "legend-item-focused": true
-        }).call(hover);
+        });
         show_graph(graph_id);
+        d3.selectAll(".legend-item.store").filter(function(){
+            if(!d3.select(this).classed("legend-item-focused")) {
+                d3.select(this).classed("transparent", true);
+                d3.selectAll(".graph").filter(function () {
+                    if (d3.select(this).attr("id") != graph_id) {
+                        d3.select(this)
+                            .classed("transparent", true);
+                    }
+                });
+            }
+        });
     }
 }
 
@@ -1010,17 +1016,11 @@ function resize() {
     svgElementPosition = svgElement[0].getBoundingClientRect();
     sumElementPosition = sumElement[0].getBoundingClientRect();
 
-    //console.log(svgElementPosition);
-    //console.log(sumElementPosition);
-
     d3.select("#tooltip")
         .style("left", svgElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px")
         .style("top", svgElementPosition.top + document.body.scrollTop + margin.top * 1.5 + "px");
     d3.select("#tooltip_sum")
         .style("left", sumElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px")
-        .style("top", sumElementPosition.top + document.body.scrollTop + margin.top * 2 + "px")
-        .call(function () {
-            //console.log(sumElementPosition.top + " " + document.body.scrollTop + " " + margin.top * 2);
-        });
+        .style("top", sumElementPosition.top + document.body.scrollTop + margin.top * 2 + "px");
 
 }

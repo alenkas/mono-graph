@@ -22,7 +22,7 @@ bugs:
   ✔ after selecting single graph dots for hidden graphs also seen @done (16-05-18 15:25)
   ✔ after update tooltip values are shown incorrectly @done (16-05-18 15:25)
   ✔ on graph hover if one graph is select tooltip shows data for each graph, not for the selected one @done (16-05-18 15:32)
-  ☐ after graph is back to visible state hover function is not working. line 622
+  ✔ after graph is back to visible state hover function is not working. line 622 @done (16-05-23 15:06)
   ✔ huge numbers go off tooltip div. @done (16-05-23 09:59)
   
 
@@ -35,5 +35,5 @@ refactoring:
   ☐ rewrite dublicated attributes as objects
   ☐ for functions like hover write selection that will work no matter which graph chart is focused right now
   ☐ maybe filter function is not the best choice, perhaps, .each?
-  ☐ isSelected = d3.select( g).classed( "selected");
+  ✔ isSelected = d3.select( g).classed( "selected"); @done (16-05-23 15:06)
   ☐ Selection by store class is temporary decision. Think about better selection. In this case there is need to add new extra classes.
