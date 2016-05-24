@@ -27,7 +27,7 @@ bugs:
   ☐ after switch to year view, y axis shows incorrect data, other graphs are not seen
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  ☐ after switch view path attr d is wrong
+  ✔ after switch view path attr d is wrong @done (16-05-24 10:56)
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   
 

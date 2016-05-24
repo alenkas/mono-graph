@@ -632,19 +632,21 @@ d3.json(url, function (error, data) {
     }
 });
 
-function updateLine(d, data) {
+function updateLine(d) {
     console.log(d);
     var minDate = d.values[0].datetime;
     var maxDate = d.values[d.values.length - 1].datetime;
 
     x.domain([minDate, maxDate]);
 
-    y.domain([
-        0,
-        d3.max(d.values, function (d) {
-            return d.store;
-        })
-    ]);
+    //y.domain([
+    //    d3.min(d.values, function (d) {
+    //        return d.store;
+    //    }),
+    //    d3.max(d.values, function (d) {
+    //        return d.store;
+    //    })
+    //]);
 
     var xAxisGen = d3.svg.axis().scale(x)
         .orient("bottom").tickFormat(d3.time.format("%d %b"))
