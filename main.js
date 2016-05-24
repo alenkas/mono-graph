@@ -1044,6 +1044,48 @@ function update_graphs() {
             //.duration(750)
             .call(yAxis);
 
+
+        d3.selectAll("select")
+            .on("change", function (d, i) {
+                //console.log(this);
+                if (d3.select(this).classed("graph-total")) {
+                    console.log(true);
+                    var total = function() {
+                        return {
+                            name: "total",
+                            values: count_total().map(function (d) {
+                                return {datetime: d.datetime, store: +d.value};
+                            })
+                        };
+                    };
+                    var total2 = total();
+
+                    var sel_total = d3.select(this).node().value;
+                    var chart_total = d3.select(this.nextElementSibling).attr("class");
+                    d3.select(this).data(total2).call(function (d) {
+                        total2.values.splice(0, total2.values.length - sel_total);
+                        updateLineTotal(total2, chart_total);
+                    });
+                } else {
+                    console.log(false);
+                    var stores = color.domain().map(function (name) {
+                        return {
+                            name: name,
+                            values: data.map(function (d) {
+                                return {datetime: d.datetime, store: +d[name]};
+                            })
+                        };
+                    });
+
+                    var sel = d3.select(this).node().value;
+                    var chart = d3.select(this.nextElementSibling).attr("class");
+                    stores.forEach(function (d) {
+                        d.values.splice(0, d.values.length - sel);
+                        updateLine(d, chart);
+                    });
+                }
+            });
+
         //---------------------------
 
         // Overall graph
