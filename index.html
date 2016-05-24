@@ -103,7 +103,7 @@
 <body>
 <div>
     <div>
-        <select id="date-option">
+        <select class="date-option">
             <option value="365">Last Year</option>
             <option value="30">Last month</option>
             <option value = "7">Last week</option>
@@ -113,9 +113,14 @@
         <div id="legend"></div>
     </div>
     <div>
-        <svg class="sum"></svg>
-        <div id="tooltip_sum"></div>
-        <div id="legend_sum"></div>
+        <select class="date-option graph-total">
+            <option value="365">Last Year</option>
+            <option value="30">Last month</option>
+            <option value = "7">Last week</option>
+        </select>
+        <svg class="total"></svg>
+        <div id="tooltip_total"></div>
+        <div id="legend_total"></div>
     </div>
 </div>
 <script src="main.js"></script>

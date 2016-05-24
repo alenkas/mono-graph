@@ -24,7 +24,7 @@ bugs:
   ✔ on graph hover if one graph is select tooltip shows data for each graph, not for the selected one @done (16-05-18 15:32)
   ✔ after graph is back to visible state hover function is not working. line 622 @done (16-05-23 15:06)
   ✔ huge numbers go off tooltip div. @done (16-05-23 09:59)
-  ☐ after switch to year view, y axis shows incorrect data, other graphs are not seen
+  ✔ after switch to year view, y axis shows incorrect data, other graphs are not seen @done (16-05-24 11:53)
 
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   ✔ after switch view path attr d is wrong @done (16-05-24 10:56)
