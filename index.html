@@ -88,10 +88,22 @@
         .hidden {
             display: none;
         }
-        
+
         .transparent,
         .legend-item-hidden {
             opacity: .3;
+        }
+
+        .right-bar {
+                      display: inline-block;
+                      vertical-align: top;
+                      list-style: none;
+                      margin: 0;
+                      padding: 0;
+                  }
+
+        .right-bar li {
+            margin-bottom: 10px;
         }
 
     </style>
@@ -102,25 +114,37 @@
 
 <body>
 <div>
-    <div>
-        <select class="date-option">
-            <option value="365">Last Year</option>
-            <option value="30">Last month</option>
-            <option value = "7">Last week</option>
-        </select>
+    <div class="graph-section">
         <svg class="chart"></svg>
         <div id="tooltip"></div>
-        <div id="legend"></div>
+        <ul class="right-bar">
+            <li>
+                <div id="legend"></div>
+            </li>
+            <li>
+                <select class="date-option">
+                    <option value="365">Last Year</option>
+                    <option value="30">Last month</option>
+                    <option value="7">Last week</option>
+                </select>
+            </li>
+        </ul>
     </div>
-    <div>
-        <select class="date-option graph-total">
-            <option value="365">Last Year</option>
-            <option value="30">Last month</option>
-            <option value = "7">Last week</option>
-        </select>
+    <div class="graph-section">
         <svg class="total"></svg>
         <div id="tooltip_total"></div>
-        <div id="legend_total"></div>
+        <ul class="right-bar">
+            <li>
+                <div id="legend_total"></div>
+            </li>
+            <li>
+                <select class="date-option graph-total">
+                    <option value="365">Last Year</option>
+                    <option value="30">Last month</option>
+                    <option value="7">Last week</option>
+                </select>
+            </li>
+        </ul>
     </div>
 </div>
 <script src="main.js"></script>

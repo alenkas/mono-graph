@@ -424,7 +424,8 @@ d3.json(url, function (error, data) {
                 var total2 = total();
 
                 var sel_total = d3.select(this).node().value;
-                var chart_total = d3.select(this.nextElementSibling).attr("class");
+                var chart_total = $(this).parents(".graph-section").children("svg").attr("class");
+                console.log(chart_total);
                 d3.select(this).data(total2).call(function (d) {
                     total2.values.splice(0, total2.values.length - sel_total);
                     updateLineTotal(total2, chart_total);
@@ -441,7 +442,7 @@ d3.json(url, function (error, data) {
                 });
 
                 var sel = d3.select(this).node().value;
-                var chart = d3.select(this.nextElementSibling).attr("class");
+                var chart = $(this).parents(".graph-section").children("svg").attr("class");
                 stores.forEach(function (d) {
                     d.values.splice(0, d.values.length - sel);
                     updateLine(d, chart);
@@ -1044,6 +1045,13 @@ function update_graphs() {
             //.duration(750)
             .call(yAxis);
 
+        // After update deselect user choise.
+        (function select(){
+            var select = document.getElementsByTagName("select");
+            for(var i = 0; i < select.length; i++){
+                select[i].selectedIndex = 0;
+            }
+        })();
 
         d3.selectAll("select")
             .on("change", function (d, i) {
