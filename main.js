@@ -408,11 +408,9 @@ d3.json(url, function (error, data) {
             });
     }
 
-    d3.selectAll("select")
+    d3.select("select")
         .on("change", function (d, i) {
-            //console.log(this);
-            if (d3.select(this).classed("graph-total")) {
-                console.log(true);
+                // update total graph
                 var total = function() {
                     return {
                         name: "total",
@@ -424,14 +422,14 @@ d3.json(url, function (error, data) {
                 var total2 = total();
 
                 var sel_total = d3.select(this).node().value;
-                var chart_total = $(this).parents(".graph-section").children("svg").attr("class");
+                var chart_total = d3.select(".total").attr("class");
                 console.log(chart_total);
                 d3.select(this).data(total2).call(function (d) {
                     total2.values.splice(0, total2.values.length - sel_total);
                     updateLineTotal(total2, chart_total);
                 });
-            } else {
-                console.log(false);
+
+                // Update main graph
                 var stores = color.domain().map(function (name) {
                     return {
                         name: name,
@@ -447,7 +445,6 @@ d3.json(url, function (error, data) {
                     d.values.splice(0, d.values.length - sel);
                     updateLine(d, chart);
                 });
-            }
         });
 
     // ------------------------------------------------------------------------------
@@ -758,7 +755,6 @@ function updateLine(d, chart) {
     store.select("path")
         .transition()
         .duration(1000)
-        //.ease("bounce")
         .attr("d", function () {
             return valueline(d.values);
         })
@@ -781,7 +777,7 @@ function updateLine(d, chart) {
     //        focus.style("display", "none");
     //    })
     //    .on("mousemove", mousemove);
-    //
+
     //function mousemove() {
     //    var x0 = x.invert(d3.mouse(this)[0]),
     //        i = bisectDate(data, x0, 1),
@@ -1055,43 +1051,41 @@ function update_graphs() {
 
         d3.selectAll("select")
             .on("change", function (d, i) {
-                //console.log(this);
-                if (d3.select(this).classed("graph-total")) {
-                    console.log(true);
-                    var total = function() {
-                        return {
-                            name: "total",
-                            values: count_total().map(function (d) {
-                                return {datetime: d.datetime, store: +d.value};
-                            })
-                        };
+                // update total graph
+                var total = function() {
+                    return {
+                        name: "total",
+                        values: count_total().map(function (d) {
+                            return {datetime: d.datetime, store: +d.value};
+                        })
                     };
-                    var total2 = total();
+                };
+                var total2 = total();
 
-                    var sel_total = d3.select(this).node().value;
-                    var chart_total = d3.select(this.nextElementSibling).attr("class");
-                    d3.select(this).data(total2).call(function (d) {
-                        total2.values.splice(0, total2.values.length - sel_total);
-                        updateLineTotal(total2, chart_total);
-                    });
-                } else {
-                    console.log(false);
-                    var stores = color.domain().map(function (name) {
-                        return {
-                            name: name,
-                            values: data.map(function (d) {
-                                return {datetime: d.datetime, store: +d[name]};
-                            })
-                        };
-                    });
+                var sel_total = d3.select(this).node().value;
+                var chart_total = d3.select(".total").attr("class");
+                console.log(chart_total);
+                d3.select(this).data(total2).call(function (d) {
+                    total2.values.splice(0, total2.values.length - sel_total);
+                    updateLineTotal(total2, chart_total);
+                });
 
-                    var sel = d3.select(this).node().value;
-                    var chart = d3.select(this.nextElementSibling).attr("class");
-                    stores.forEach(function (d) {
-                        d.values.splice(0, d.values.length - sel);
-                        updateLine(d, chart);
-                    });
-                }
+                // Update main graph
+                var stores = color.domain().map(function (name) {
+                    return {
+                        name: name,
+                        values: data.map(function (d) {
+                            return {datetime: d.datetime, store: +d[name]};
+                        })
+                    };
+                });
+
+                var sel = d3.select(this).node().value;
+                var chart = $(this).parents(".graph-section").children("svg").attr("class");
+                stores.forEach(function (d) {
+                    d.values.splice(0, d.values.length - sel);
+                    updateLine(d, chart);
+                });
             });
 
         //---------------------------

@@ -7,6 +7,8 @@ chart:
   ✔ add buttons to choose period on which to show graph (weeks, months, etc) @done (16-05-23 19:59)
   ✔ on graph update also update last store values @done (16-05-13 13:39)
   ☐ redraw y axis when deselecting graphs
+  ☐ add calendar to choose date range
+  ☐ only one control bar which changes both graphs
 
 axis:
   ✔ x axis should show day interval @done (16-05-13 14:45)
@@ -28,6 +30,7 @@ bugs:
   ✔ after switch view path attr d is wrong @done (16-05-24 10:56)
   ✔ after update date range selection show previous data @done (16-05-24 12:24)
   ☐ after update date range needs to remain as user selected
+  ✔ on date range select any range and mouseover other graph, tooltip of other graph is showing wrong data  @done (16-05-24 18:47) no more needed as one control bar for each graph
   
 
 refactoring: 
