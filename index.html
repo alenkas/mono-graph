@@ -107,36 +107,50 @@
         }
 
     </style>
+    <!--<link href="jquery-ui.min.css" rel="stylesheet">-->
+    <link href="jquery.comiseo.daterangepicker.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-beta1/jquery.min.js"></script>
     <script src="https://code.jquery.com/ui/1.11.3/jquery-ui.min.js"></script>
-    <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <!--<script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>-->
+    <script src="moment.js"></script>
+    <script src="jquery.comiseo.daterangepicker.js"></script>
+
 </head>
 
 <body>
 <div>
-    <div class="graph-section">
-        <svg class="chart"></svg>
-        <div id="tooltip"></div>
-        <ul class="right-bar">
-            <li>
-                <div id="legend"></div>
-            </li>
-            <li>
-                <select class="date-option">
-                    <option value="365">Last Year</option>
-                    <option value="30">Last month</option>
-                    <option value="7">Last week</option>
-                </select>
-            </li>
-        </ul>
-    </div>
-    <div class="graph-section">
-        <svg class="total"></svg>
-        <div id="tooltip_total"></div>
-        <div id="legend_total"></div>
-    </div>
+    <script>
+        $(function(){
+            $("#e2").daterangepicker({
+                initialText : 'Select period...'
+            });
+        });
+    </script>
+    <!--<div class="graph-section">-->
+        <!--<svg class="chart"></svg>-->
+        <!--<div id="tooltip"></div>-->
+        <!--<ul class="right-bar">-->
+            <!--<li>-->
+                <!--<div id="legend"></div>-->
+            <!--</li>-->
+            <!--<li>-->
+                <!--<select class="date-option">-->
+                    <!--<option value="365">Last Year</option>-->
+                    <!--<option value="30">Last month</option>-->
+                    <!--<option value="7">Last week</option>-->
+                <!--</select>-->
+            <!--</li>-->
+        <!--</ul>-->
+    <!--</div>-->
+    <input class="raw" id="e2"/>
+    <!--<div class="graph-section" style="visibility: hidden;">-->
+        <!--<svg class="total"></svg>-->
+        <!--<div id="tooltip_total"></div>-->
+        <!--<div id="legend_total"></div>-->
+    <!--</div>-->
 </div>
-<script src="main.js"></script>
+<!--<script src="main.js"></script>-->
+
 </body>
 
 </html>
