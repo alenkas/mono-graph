@@ -91,15 +91,15 @@ var valueline_total = d3.svg.line()
 //var legend = d3.select("#legend")
 //    .attr("class", "legend")
 //    .style("margin-top", margin.top + "px");
-
-// Create SVG element
-var total = d3.select(".total")
-    .attr({
-        "width": width + margin.left + margin.right,
-        "height": height + margin.top + margin.bottom
-    })
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+//
+//// Create SVG element
+//var total = d3.select(".total")
+//    .attr({
+//        "width": width + margin.left + margin.right,
+//        "height": height + margin.top + margin.bottom
+//    })
+//    .append("g")
+//    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var totalElement = document.getElementsByClassName("total");
 var totalElementPosition = totalElement[0].getBoundingClientRect();
@@ -160,6 +160,8 @@ function render(filterByDates) {
     d3.json(url, function (error, data) {
 
         d3.select('svg').remove();
+        d3.select('#tooltip').select('div').remove();
+        d3.select("#legend").select('div').remove();
 
         if (error) return console.warn(error);
 
@@ -268,183 +270,210 @@ function render(filterByDates) {
                 return color(d.name);
             });
 
-        //legend.append("div")
-        //    .attr("id", "legend-title")
-        //    .text("Stores")
-        //    .on("click", update_graphs)
-        //    .append("span")
-        //    .attr("id", "refresh")
-        //    .attr("class", "ui-icon ui-icon-arrowrefresh-1-e")
-        //    .on("click", update_graphs);
-        //
-        //var legend_section = legend.selectAll(".legend-item")
-        //    .data(stores)
-        //    .enter().append("div")
-        //    .attr("class", function (d) {
-        //        return "legend-item " + "legend-item-" + d.name + " store";
-        //    })
-        //    .attr({
-        //        "width": width / 4,
-        //        "height": height / 4
-        //    })
-        //    .attr("data-store", function (d) {
-        //        return d.name;
-        //    })
-        //    .on("click", click_function)
-        //    .on("mouseover", mouseover)
-        //    .on("mouseout", mouseout);
-        //
-        //legend_section.append("div")
-        //    .attr("class", "legend-swatch")
-        //    .style("background-color", function (d) {
-        //        return color(d.name);
-        //    });
-        //
-        //legend_section.append("div")
-        //    .attr("class", "legend-title")
-        //    .attr("data-store", function (d) {
-        //        return d.name;
-        //    })
-        //    .text(function (d) {
-        //        return d.name;
-        //    });
-        //
-        //tooltip.append("div")
-        //    .attr("id", "tooltip-title")
-        //    .style("font-weight", "bold")
-        //    .text("Stores");
-        //
-        //var tooltip_section = tooltip.selectAll(".graph")
-        //    .data(stores)
-        //    .enter().append("div")
-        //    .attr("class", function (d) {
-        //        return "tooltip-section " + d.name;
-        //    });
-        //
-        //tooltip_section.append("div")
-        //    .attr("class", "tooltip-swatch")
-        //    .style("background-color", function (d) {
-        //        return color(d.name);
-        //    });
-        //
-        //tooltip_section.append("div")
-        //    .attr("class", "tooltip-title")
-        //    .attr("title", function (d) {
-        //        return d.name;
-        //    })
-        //    .text(function (d) {
-        //        return d.name;
-        //    });
-        //
-        //tooltip_section.append("div")
-        //    .attr("class", "tooltip-value")
-        //    .style("color", function (d) {
-        //        return color(d.name);
-        //    })
-        //    .text(function (d) {
-        //        // return last value
-        //        return formatLargeNumbers(d.values[d.values.length - 1].store);
-        //    });
-        //
-        //
-        //// don't know what's this for
-        //// Add the valueline path.
-        ////lineSvg.append("path")
-        ////    .attr("class", "line")
-        ////    .attr("d", valueline(data));
-        //
-        //// append the x line
-        //focus.append("line")
-        //    .data(stores)
-        //    .attr("class", "x")
-        //    .style("stroke", function (d) {
-        //        return color(d.name);
-        //    })
-        //    .style("stroke-dasharray", "3,3")
-        //    .style("opacity", 0.5)
-        //    .attr({
-        //        "y1": 0,
-        //        "y2": height
-        //    });
-        //
-        //// append the circle at the intersection
-        //focus.selectAll("circle")
-        //    .data(stores)
-        //    .enter().append("circle")
-        //    .attr("class", function (d) {
-        //        return d.name;
-        //    })
-        //    .style("fill", "#FFFFFF")
-        //    .style("stroke", function (d) {
-        //        return color(d.name);
-        //    })
-        //    .attr("r", 4);
-        //
-        //// append the rectangle to capture mouse
-        //svg.append("rect")
-        //    .data(stores)
-        //    .attr({
-        //        "width": width,
-        //        "height": height
-        //    })
-        //    .attr("class", "rect-capture-mouse")
-        //    .style("fill", "none")
-        //    .style("pointer-events", "all")
-        //    .on("mouseover", function () {
-        //        tooltip.style("display", null);
-        //        focus.style("display", null);
-        //    })
-        //    .on("mouseout", function () {
-        //        tooltip.style("display", "none");
-        //        focus.style("display", "none");
-        //    })
-        //    .on("mousemove", mousemove);
-        //
-        //function mousemove() {
-        //    var x0 = x.invert(d3.mouse(this)[0]),
-        //        i = bisectDate(data, x0, 1),
-        //        d0 = data[i - 1],
-        //        d1 = data[i],
-        //        d = x0 - d0.datetime > d1.datetime - x0 ? d1 : d0;
-        //
-        //    // Loop through object to fin each store value, append it to circles and
-        //    // set their transform attribute
-        //    for (var key in d) {
-        //        if (key != "datetime") {
-        //            focus.select("circle." + key)
-        //                .attr("value", d[key])
-        //                .attr("transform",
-        //                "translate(" + x(d.datetime) + "," +
-        //                y(d[key]) + ")");
-        //        }
-        //    }
-        //
-        //    focus.select(".x")
-        //        .attr("transform",
-        //        "translate(" + x(d.datetime) + "," +
-        //        0 + ")")
-        //        .attr("y2", height);
-        //
-        //    focus.select(".y")
-        //        .attr("transform",
-        //        "translate(" + width * -1 + "," +
-        //        y(d.play) + ")")
-        //        .attr("x2", width + width);
-        //
-        //    tooltip.select("#tooltip-title")
-        //        .text(function () {
-        //            var month_number = d.datetime.getMonth();
-        //            var date = d.datetime.getDate() + " " + get_month(month_number) + " " + (d.datetime.getFullYear() + 1);
-        //            return date;
-        //        });
-        //
-        //    tooltip.selectAll(".tooltip-value")
-        //        .data(stores)
-        //        .text(function (d) {
-        //            var value = d3.select("circle." + d.name).attr("value");
-        //            return formatLargeNumbers(value);
-        //        });
-        //}
+        var svgElement = document.getElementsByClassName("chart");
+        var svgElementPosition = svgElement[0].getBoundingClientRect();
+        console.log(svgElementPosition);
+
+
+        var legend = d3.select("#legend")
+            .append('div')
+            .attr("class", "legend")
+            .style("margin-top", margin.top + "px");
+
+
+
+        legend.append("div")
+            .attr("id", "legend-title")
+            .text("Stores")
+            .on("click", update_graphs)
+            .append("span")
+            .attr("id", "refresh")
+            .attr("class", "ui-icon ui-icon-arrowrefresh-1-e")
+            .on("click", update_graphs);
+
+        var legend_section = legend.selectAll(".legend-item")
+            .data(stores)
+            .enter().append("div")
+            .attr("class", function (d) {
+                return "legend-item " + "legend-item-" + d.name + " store";
+            })
+            .attr({
+                "width": width / 4,
+                "height": height / 4
+            })
+            .attr("data-store", function (d) {
+                return d.name;
+            })
+            .on("click", click_function)
+            .on("mouseover", mouseover)
+            .on("mouseout", mouseout);
+
+        legend_section.append("div")
+            .attr("class", "legend-swatch")
+            .style("background-color", function (d) {
+                return color(d.name);
+            });
+
+        legend_section.append("div")
+            .attr("class", "legend-title")
+            .attr("data-store", function (d) {
+                return d.name;
+            })
+            .text(function (d) {
+                return d.name;
+            });
+
+        var tooltip = d3.select("#tooltip")
+            .append("div")
+            .attr("id", "tooltip")
+            .attr("class", "tooltip")
+            .style("display", "none")
+            .style({
+                "left": svgElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px",
+                "top": svgElementPosition.top + document.body.scrollTop + margin.top * 1.5 + "px"
+            });
+
+        tooltip.append("div")
+            .attr("id", "tooltip-title")
+            .style("font-weight", "bold")
+            .text("Stores");
+
+        var tooltip_section = tooltip.selectAll(".graph")
+            .data(stores)
+            .enter().append("div")
+            .attr("class", function (d) {
+                return "tooltip-section " + d.name;
+            });
+
+        tooltip_section.append("div")
+            .attr("class", "tooltip-swatch")
+            .style("background-color", function (d) {
+                return color(d.name);
+            });
+
+        tooltip_section.append("div")
+            .attr("class", "tooltip-title")
+            .attr("title", function (d) {
+                return d.name;
+            })
+            .text(function (d) {
+                return d.name;
+            });
+
+        tooltip_section.append("div")
+            .attr("class", "tooltip-value")
+            .style("color", function (d) {
+                return color(d.name);
+            })
+            .text(function (d) {
+                // return last value
+                return formatLargeNumbers(d.values[d.values.length - 1].store);
+            });
+
+
+        // don't know what's this for
+        // Add the valueline path.
+        //lineSvg.append("path")
+        //    .attr("class", "line")
+        //    .attr("d", valueline(data));
+
+        var focus = svg.append("g")
+    .attr("class", "hover")
+    .style("display", "none");
+
+
+        // append the x line
+        focus.append("line")
+            .data(stores)
+            .attr("class", "x")
+            .style("stroke", function (d) {
+                return color(d.name);
+            })
+            .style("stroke-dasharray", "3,3")
+            .style("opacity", 0.5)
+            .attr({
+                "y1": 0,
+                "y2": height
+            });
+
+        // append the circle at the intersection
+        focus.selectAll("circle")
+            .data(stores)
+            .enter().append("circle")
+            .attr("class", function (d) {
+                return d.name;
+            })
+            .style("fill", "#FFFFFF")
+            .style("stroke", function (d) {
+                return color(d.name);
+            })
+            .attr("r", 4);
+
+        // append the rectangle to capture mouse
+        svg.append("rect")
+            .data(stores)
+            .attr({
+                "width": width,
+                "height": height
+            })
+            .attr("class", "rect-capture-mouse")
+            .style("fill", "none")
+            .style("pointer-events", "all")
+            .on("mouseover", function () {
+                tooltip.style("display", null);
+                focus.style("display", null);
+            })
+            .on("mouseout", function () {
+                tooltip.style("display", "none");
+                focus.style("display", "none");
+            })
+            .on("mousemove", mousemove);
+
+        function mousemove() {
+            var x0 = x.invert(d3.mouse(this)[0]),
+                i = bisectDate(data, x0, 1),
+                d0 = data[i - 1],
+                d1 = data[i],
+                d = x0 - d0.datetime > d1.datetime - x0 ? d1 : d0;
+
+            // Loop through object to fin each store value, append it to circles and
+            // set their transform attribute
+            for (var key in d) {
+                if (key != "datetime") {
+                    focus.select("circle." + key)
+                        .attr("value", d[key])
+                        .attr("transform",
+                        "translate(" + x(d.datetime) + "," +
+                        y(d[key]) + ")");
+                }
+            }
+
+            focus.select(".x")
+                .attr("transform",
+                "translate(" + x(d.datetime) + "," +
+                0 + ")")
+                .attr("y2", height);
+
+            focus.select(".y")
+                .attr("transform",
+                "translate(" + width * -1 + "," +
+                y(d.play) + ")")
+                .attr("x2", width + width);
+
+            tooltip.select("#tooltip-title")
+                .text(function () {
+                    var month_number = d.datetime.getMonth();
+                    var date = d.datetime.getDate() + " " + get_month(month_number) + " " + (d.datetime.getFullYear() + 1);
+                    return date;
+                });
+
+            tooltip.selectAll(".tooltip-value")
+                .data(stores)
+                .text(function (d) {
+                    var value = d3.select("circle." + d.name).attr("value");
+                    return formatLargeNumbers(value);
+                });
+        }
 
 
         //$("#e1").daterangepicker({
@@ -654,6 +683,16 @@ function render(filterByDates) {
         //
         //    });
 
+
+
+        // Create SVG element
+        var total = d3.select(".total")
+            .attr({
+                "width": width + margin.left + margin.right,
+                "height": height + margin.top + margin.bottom
+            })
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
         // ------------------------------------------------------------------------------
 
         // Overall graph
