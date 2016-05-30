@@ -152,6 +152,7 @@ $("#e1").daterangepicker({
         input_end_date.setAttribute("value", endDate);
         //console.log(startDate, endDate);
         render(true);
+        update_graphs(true);
     }
 });
 
@@ -281,15 +282,15 @@ function render(filterByDates) {
             .style("margin-top", margin.top + "px");
 
 
-
         legend.append("div")
             .attr("id", "legend-title")
             .text("Stores")
-            .on("click", update_graphs)
             .append("span")
             .attr("id", "refresh")
             .attr("class", "ui-icon ui-icon-arrowrefresh-1-e")
-            .on("click", update_graphs);
+            .on("click", function(){
+                update_graphs(false);
+            });
 
         var legend_section = legend.selectAll(".legend-item")
             .data(stores)
@@ -378,8 +379,8 @@ function render(filterByDates) {
         //    .attr("d", valueline(data));
 
         var focus = svg.append("g")
-    .attr("class", "hover")
-    .style("display", "none");
+            .attr("class", "hover")
+            .style("display", "none");
 
 
         // append the x line
@@ -463,7 +464,7 @@ function render(filterByDates) {
             tooltip.select("#tooltip-title")
                 .text(function () {
                     var month_number = d.datetime.getMonth();
-                    var date = d.datetime.getDate() + " " + get_month(month_number) + " " + (d.datetime.getFullYear() + 1);
+                    var date = d.datetime.getDate() + " " + get_month(month_number) + " " + d.datetime.getFullYear();
                     return date;
                 });
 
@@ -639,7 +640,7 @@ function render(filterByDates) {
         //                tooltip.select("#tooltip-title")
         //                    .text(function () {
         //                        var month_number = d.datetime.getMonth();
-        //                        var date = d.datetime.getDate() + " " + get_month(month_number) + " " + (d.datetime.getFullYear() + 1);
+        //                        var date = d.datetime.getDate() + " " + get_month(month_number) + " " + d.datetime.getFullYear();
         //                        return date;
         //                    });
         //
@@ -682,7 +683,6 @@ function render(filterByDates) {
         //
         //
         //    });
-
 
 
         // Create SVG element
@@ -905,7 +905,7 @@ function render(filterByDates) {
         //    tooltip_total.select("#tooltip-title")
         //        .text(function () {
         //            var month_number = d.datetime.getMonth();
-        //            var date = d.datetime.getDate() + " " + get_month(month_number) + " " + (d.datetime.getFullYear() + 1);
+        //            var date = d.datetime.getDate() + " " + get_month(month_number) + " " + d.datetime.getFullYear();
         //            return date;
         //        });
         //
@@ -1060,7 +1060,7 @@ render(false);
 //    //    tooltip.select("#tooltip-title")
 //    //        .text(function () {
 //    //            var month_number = d.datetime.getMonth();
-//    //            var date = d.datetime.getDate() + " " + get_month(month_number) + " " + (d.datetime.getFullYear() + 1);
+//    //            var date = d.datetime.getDate() + " " + get_month(month_number) + " " + d.datetime.getFullYear();
 //    //            return date;
 //    //        });
 //    //
@@ -1141,8 +1141,14 @@ render(false);
 //        .style("display", "inline");
 //}
 
-function update_graphs() {
+function update_graphs(filterByDates) {
     d3.json("data1.json", function (error, data) {
+
+        console.log("data updated");
+
+        d3.select('svg').remove();
+        d3.select('#tooltip').select('div').remove();
+        d3.select("#legend").select('div').remove();
 
         color.domain(d3.keys(data[0]).filter(function (key) {
             return key !== "datetime";
@@ -1151,6 +1157,12 @@ function update_graphs() {
         data.forEach(function (d) {
             d.datetime = parseDate(d.datetime);
         });
+
+        if (filterByDates) {
+            data = data.filter(function (d) {
+                return d.datetime >= startDate && d.datetime <= endDate;
+            });
+        }
 
         var stores = color.domain().map(function (name) {
             return {
@@ -1178,44 +1190,217 @@ function update_graphs() {
             })
         ]);
 
-        // Select the section we want to apply our changes to
-        var svg = d3.select(".chart");
+        // Create SVG element
+        var svg = d3.select(".chart").append("svg")
+            .attr({
+                "width": width + margin.left + margin.right,
+                "height": height + margin.top + margin.bottom
+            })
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        // Redraw vertical grid
-        svg.select(".grid.x")
+        // Draw horizontal lines
+        svg.append("g")
+            .attr("class", "x grid")
             .attr("transform", "translate(0," + height + ")")
             .call(make_x_axis()
                 .tickSize(-height, 0, 0)
                 .tickFormat("")
         );
 
-        //Redraw horizontal grid
-        svg.select(".grid.y")
-            //.attr("transform", "translate(0," + height + ")")
+        // Draw vertical lines
+        svg.append("g")
+            .attr("class", "y grid")
             .call(make_y_axis()
                 .tickSize(-width, 0, 0)
                 .tickFormat("")
         );
 
-        var store = svg.selectAll(".graph")
-            .data(stores);
 
-        store.select("path")
-            .transition()
-            .duration(750)
+        // Add the X Axis
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis)
+            .selectAll("text")
+            .style("text-anchor", "end")
+            .attr({
+                "dx": "-.8em",
+                "dy": ".15em"
+            })
+            .attr("transform", "rotate(-45)");
+        // Add the Y Axis
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+
+        var store = svg.selectAll(".graph")
+            .data(stores)
+            .enter().append("g")
+            .attr("class", "graph")
+            .attr("id", function (d) {
+                return d.name;
+            });
+
+        // Add the valueline path for stores.
+        store.append("path")
+            .attr("class", "line")
+            .attr("fill", "none")
             .attr("d", function (d) {
                 return valueline(d.values);
             })
-            .style("display", "inline");
+            .style("stroke", function (d) {
+                return color(d.name);
+            });
 
-        //append the rectangle to capture mouse
-        svg.select(".rect-capture-mouse")
+        var svgElement = document.getElementsByClassName("chart");
+        var svgElementPosition = svgElement[0].getBoundingClientRect();
+        //console.log(svgElementPosition);
+
+
+        var legend = d3.select("#legend")
+            .append('div')
+            .attr("class", "legend")
+            .style("margin-top", margin.top + "px");
+
+
+        legend.append("div")
+            .attr("id", "legend-title")
+            .text("Stores")
+            //.on("click", update_graphs)
+            .append("span")
+            .attr("id", "refresh")
+            .attr("class", "ui-icon ui-icon-arrowrefresh-1-e")
+            .on("click", function(){
+                update_graphs(false);
+            });
+
+        var legend_section = legend.selectAll(".legend-item")
+            .data(stores)
+            .enter().append("div")
+            .attr("class", function (d) {
+                return "legend-item " + "legend-item-" + d.name + " store";
+            })
+            .attr({
+                "width": width / 4,
+                "height": height / 4
+            })
+            .attr("data-store", function (d) {
+                return d.name;
+            })
+            .on("click", click_function)
+            .on("mouseover", mouseover)
+            .on("mouseout", mouseout);
+
+        legend_section.append("div")
+            .attr("class", "legend-swatch")
+            .style("background-color", function (d) {
+                return color(d.name);
+            });
+
+        legend_section.append("div")
+            .attr("class", "legend-title")
+            .attr("data-store", function (d) {
+                return d.name;
+            })
+            .text(function (d) {
+                return d.name;
+            });
+
+        var tooltip = d3.select("#tooltip")
+            .append("div")
+            .attr("id", "tooltip")
+            .attr("class", "tooltip")
+            .style("display", "none")
+            .style({
+                "left": svgElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px",
+                "top": svgElementPosition.top + document.body.scrollTop + margin.top * 1.5 + "px"
+            });
+
+        tooltip.append("div")
+            .attr("id", "tooltip-title")
+            .style("font-weight", "bold")
+            .text("Stores");
+
+        var tooltip_section = tooltip.selectAll(".graph")
+            .data(stores)
+            .enter().append("div")
+            .attr("class", function (d) {
+                return "tooltip-section " + d.name;
+            });
+
+        tooltip_section.append("div")
+            .attr("class", "tooltip-swatch")
+            .style("background-color", function (d) {
+                return color(d.name);
+            });
+
+        tooltip_section.append("div")
+            .attr("class", "tooltip-title")
+            .attr("title", function (d) {
+                return d.name;
+            })
+            .text(function (d) {
+                return d.name;
+            });
+
+        tooltip_section.append("div")
+            .attr("class", "tooltip-value")
+            .style("color", function (d) {
+                return color(d.name);
+            })
+            .text(function (d) {
+                // return last value
+                return formatLargeNumbers(d.values[d.values.length - 1].store);
+            });
+
+
+        // don't know what's this for
+        // Add the valueline path.
+        //lineSvg.append("path")
+        //    .attr("class", "line")
+        //    .attr("d", valueline(data));
+
+        var focus = svg.append("g")
+            .attr("class", "hover")
+            .style("display", "none");
+
+
+        // append the x line
+        focus.append("line")
+            .data(stores)
+            .attr("class", "x")
+            .style("stroke", function (d) {
+                return color(d.name);
+            })
+            .style("stroke-dasharray", "3,3")
+            .style("opacity", 0.5)
+            .attr({
+                "y1": 0,
+                "y2": height
+            });
+
+        // append the circle at the intersection
+        focus.selectAll("circle")
+            .data(stores)
+            .enter().append("circle")
+            .attr("class", function (d) {
+                return d.name;
+            })
+            .style("fill", "#FFFFFF")
+            .style("stroke", function (d) {
+                return color(d.name);
+            })
+            .attr("r", 4);
+
+        // append the rectangle to capture mouse
+        svg.append("rect")
             .data(stores)
             .attr({
                 "width": width,
                 "height": height
             })
-            //.attr("rect-capture-mouse")
+            .attr("class", "rect-capture-mouse")
             .style("fill", "none")
             .style("pointer-events", "all")
             .on("mouseover", function () {
@@ -1235,6 +1420,8 @@ function update_graphs() {
                 d1 = data[i],
                 d = x0 - d0.datetime > d1.datetime - x0 ? d1 : d0;
 
+            // Loop through object to fin each store value, append it to circles and
+            // set their transform attribute
             for (var key in d) {
                 if (key != "datetime") {
                     focus.select("circle." + key)
@@ -1260,7 +1447,7 @@ function update_graphs() {
             tooltip.select("#tooltip-title")
                 .text(function () {
                     var month_number = d.datetime.getMonth();
-                    var date = d.datetime.getDate() + " " + get_month(month_number) + " " + (d.datetime.getFullYear() + 1);
+                    var date = d.datetime.getDate() + " " + get_month(month_number) + " " + d.datetime.getFullYear();
                     return date;
                 });
 
@@ -1272,71 +1459,45 @@ function update_graphs() {
                 });
         }
 
-        // update the x axis
-        svg.select(".x.axis")
-            //.duration(750)
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis)
-            .selectAll("text")
-            .style("text-anchor", "end")
-            .attr({
-                "dx": "-.8em",
-                "dy": ".15em"
-            })
-            .attr("transform", "rotate(-45)");
 
-        // update the y axis
-        svg.select(".y.axis")
-            //.duration(750)
-            .call(yAxis);
-
-        // After update deselect user choise.
-        (function select() {
-            var select = document.getElementsByTagName("select");
-            for (var i = 0; i < select.length; i++) {
-                select[i].selectedIndex = 0;
-            }
-        })();
-
-        d3.selectAll("select")
-            .on("change", function (d, i) {
-                // update total graph
-                var total = function () {
-                    return {
-                        name: "total",
-                        values: count_total().map(function (d) {
-                            return {datetime: d.datetime, store: +d.value};
-                        })
-                    };
-                };
-                var total2 = total();
-
-                var sel_total = d3.select(this).node().value;
-                var chart_total = d3.select(".total").attr("class");
-                console.log(chart_total);
-                d3.select(this).data(total2).call(function (d) {
-                    total2.values.splice(0, total2.values.length - sel_total);
-                    updateLineTotal(total2, chart_total);
-                });
-
-                // Update main graph
-                var stores = color.domain().map(function (name) {
-                    return {
-                        name: name,
-                        values: data.map(function (d) {
-                            return {datetime: d.datetime, store: +d[name]};
-                        })
-                    };
-                });
-
-                var sel = d3.select(this).node().value;
-                var chart = $(this).parents(".graph-section").children("svg").attr("class");
-                stores.forEach(function (d) {
-                    d.values.splice(0, d.values.length - sel);
-                    updateLine(d, chart);
-                });
-            });
+        //d3.selectAll("select")
+        //    .on("change", function (d, i) {
+        //        // update total graph
+        //        var total = function () {
+        //            return {
+        //                name: "total",
+        //                values: count_total().map(function (d) {
+        //                    return {datetime: d.datetime, store: +d.value};
+        //                })
+        //            };
+        //        };
+        //        var total2 = total();
+        //
+        //        var sel_total = d3.select(this).node().value;
+        //        var chart_total = d3.select(".total").attr("class");
+        //        console.log(chart_total);
+        //        d3.select(this).data(total2).call(function (d) {
+        //            total2.values.splice(0, total2.values.length - sel_total);
+        //            updateLineTotal(total2, chart_total);
+        //        });
+        //
+        //        // Update main graph
+        //        var stores = color.domain().map(function (name) {
+        //            return {
+        //                name: name,
+        //                values: data.map(function (d) {
+        //                    return {datetime: d.datetime, store: +d[name]};
+        //                })
+        //            };
+        //        });
+        //
+        //        var sel = d3.select(this).node().value;
+        //        var chart = $(this).parents(".graph-section").children("svg").attr("class");
+        //        stores.forEach(function (d) {
+        //            d.values.splice(0, d.values.length - sel);
+        //            updateLine(d, chart);
+        //        });
+        //    });
 
         //---------------------------
 
@@ -1450,7 +1611,7 @@ function update_graphs() {
             tooltip_total.select("#tooltip-title")
                 .text(function () {
                     var month_number = d.datetime.getMonth();
-                    var date = d.datetime.getDate() + " " + get_month(month_number) + " " + (d.datetime.getFullYear() + 1);
+                    var date = d.datetime.getDate() + " " + get_month(month_number) + " " + d.datetime.getFullYear();
                     return date;
                 });
 
@@ -1591,8 +1752,9 @@ function click_function() {
 d3.select(window).on("resize", resize);
 
 function resize() {
-    svgElementPosition = svgElement[0].getBoundingClientRect();
-    totalElementPosition = totalElement[0].getBoundingClientRect();
+    var svgElement = document.getElementsByClassName("chart");
+    var svgElementPosition = svgElement[0].getBoundingClientRect();
+    var totalElementPosition = totalElement[0].getBoundingClientRect();
 
     d3.select("#tooltip")
         .style({
