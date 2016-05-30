@@ -104,6 +104,26 @@ function render(filterByDates) {
         d3.select('#tooltip').select('div').remove();
         d3.select("#legend").select('div').remove();
 
+        (function count_all() {
+
+            for (var i = 0; i < data.length; i++) {
+                for (var key in data[i]) {
+                    if (key != "datetime" && key != "total") {
+                        data[i].total = 0;
+                    }
+                }
+            }
+
+            for (var i = 0; i < data.length; i++) {
+                for (var key in data[i]) {
+                    if (key != "datetime" && key != "total") {
+                        data[i].total += data[i][key];
+                        //console.log(data[i].total);
+                    }
+                }
+            }
+        })();
+
         if (error) return console.warn(error);
 
         color.domain(d3.keys(data[0]).filter(function (key) {
@@ -129,53 +149,6 @@ function render(filterByDates) {
             };
         });
 
-        console.log(stores);
-
-        (function count_all() {
-            stores.push({
-                name: "total",
-                values: function(){
-                    var number = []
-                    for (var k = 0; k < stores[0].values.length; k++) {
-                        number.push({
-                            datetime: data[k].datetime,
-                            store: 0
-                        });
-                    }
-                    // Overwrite array values with new ones
-                    for (var i = 0; i < stores.length; i++) {
-                        for (var j = 0; j < stores[i].values.length; j++) {
-                            number[j].store += parseInt(stores[i].values[j].store);
-                        }
-                    }
-                    return number;
-                }()
-
-            });
-
-
-            //var number = [];
-            //// Fill array with zero values
-            //for (var k = 0; k < stores[0].values.length; k++) {
-            //    number.push({
-            //        datetime: data[k].datetime,
-            //        store: 0
-            //    });
-            //}
-            //// Overwrite array values with new ones
-            //for (var i = 0; i < stores.length; i++) {
-            //    for (var j = 0; j < stores[i].values.length; j++) {
-            //        number[j].store += parseInt(stores[i].values[j].store);
-            //    }
-            //}
-            //console.log(number);
-            //return number;
-        })();
-
-        //count_all();
-
-        console.log(stores);
-
         x.domain(d3.extent(data, function (d) {
             return d.datetime;
         }));
@@ -193,37 +166,7 @@ function render(filterByDates) {
             })
         ]);
 
-
-        //Overall graph
-
-        //This one for counting overall users
-        //var count_total = function () {
-        //    var number = [];
-        //    // Fill array with zero values
-        //    for (var k = 0; k < stores[0].values.length; k++) {
-        //        number.push({
-        //            datetime: data[k].datetime,
-        //            store: 0
-        //        });
-        //    }
-        //    // Overwrite array values with new ones
-        //    for (var i = 0; i < stores.length; i++) {
-        //        for (var j = 0; j < stores[i].values.length; j++) {
-        //            number[j].store += parseInt(stores[i].values[j].store);
-        //        }
-        //    }
-        //    return number;
-        //};
-
-
-
-        //y.domain([
-        //    0,
-        //    d3.max(count_total(), function (d) {
-        //        return Math.max(d.store);
-        //    })
-        //]);
-
+        console.log(stores);
 
         // Create SVG element
         var svg = d3.select(".chart")
@@ -243,7 +186,7 @@ function render(filterByDates) {
             .call(make_x_axis()
                 .tickSize(-height, 0, 0)
                 .tickFormat("")
-        );
+            );
 
         // Draw vertical lines
         svg.append("g")
@@ -251,7 +194,7 @@ function render(filterByDates) {
             .call(make_y_axis()
                 .tickSize(-width, 0, 0)
                 .tickFormat("")
-        );
+            );
 
 
         // Add the X Axis
@@ -289,20 +232,6 @@ function render(filterByDates) {
             .style("stroke", function (d) {
                 return color(d.name);
             });
-
-        //var store_total = svg.append("g")
-        //    .data(stores)
-        //    .attr("class", "graph total")
-        //    .attr("id", "total");
-        //
-        //// Add the valueline path for stores.
-        //store_total.append("path")
-        //    .attr("class", "line")
-        //    .attr("fill", "none")
-        //    .attr("d", function () {
-        //        return valueline(count_total());
-        //    })
-        //    .style("stroke", "#D62728");
 
         var svgElement = document.getElementsByClassName("chart");
         var svgElementPosition = svgElement[0].getBoundingClientRect();
@@ -358,25 +287,6 @@ function render(filterByDates) {
                 return d.name;
             });
 
-        //var legend_section_total = legend.append("div")
-        //    .attr("class", "legend-item")
-        //    .attr({
-        //        "width": width / 4,
-        //        "height": height / 4
-        //    })
-        //    .attr("data-store", "total")
-        //    .on("click", click_function)
-        //    .on("mouseover", mouseover)
-        //    .on("mouseout", mouseout);
-        //
-        //legend_section_total.append("div")
-        //    .attr("class", "legend-swatch")
-        //    .style("background-color", "#D62728");
-        //
-        //legend_section_total.append("div")
-        //    .attr("class", "legend-title")
-        //    .text("Total");
-
         // TOOLTIP
 
         var tooltip = d3.select("#tooltip")
@@ -426,27 +336,6 @@ function render(filterByDates) {
                 return formatLargeNumbers(d.values[d.values.length - 1].store);
             });
 
-        //var tooltip_section_total = tooltip.append("div")
-        //    .data(count_total())
-        //    .attr("class", "tooltip-section total");
-        //
-        //tooltip_section_total.append("div")
-        //    .attr("class", "tooltip-swatch")
-        //    .style("background-color", "#D62728");
-        //
-        //tooltip_section_total.append("div")
-        //    .attr("class", "tooltip-title")
-        //    .attr("title", "Total")
-        //    .text("Total");
-        //
-        //tooltip_section_total.append("div")
-        //    .attr("class", "tooltip-value")
-        //    .text(function () {
-        //        // return last value
-        //        return formatLargeNumbers(count_total()[count_total().length - 1].store);
-        //    });
-
-
         // don't know what's this for
         // Add the valueline path.
         //lineSvg.append("path")
@@ -485,29 +374,6 @@ function render(filterByDates) {
             })
             .attr("r", 4);
 
-
-        //var focus_total = svg.append("g")
-        //    .attr("class", "hover")
-        //    .style("display", "none");
-
-        // append the x line
-        //focus.append("line")
-        //    .data(count_total())
-        //    .attr("class", "x total")
-        //    .style("stroke", "#1B1B1B")
-        //    .style("stroke-dasharray", "3,3")
-        //    .style("opacity", 0.5)
-        //    .attr("y1", 0)
-        //    .attr("y2", height);
-        //
-        //// append the circle at the intersection
-        //focus.append("circle")
-        //    .data(count_total())
-        //    .attr("class", "total")
-        //    .style("fill", "#FFFFFF")
-        //    .style("stroke", "#D62728")
-        //    .attr("r", 4);
-
         // append the rectangle to capture mouse
         svg.append("rect")
             .data(stores)
@@ -543,21 +409,21 @@ function render(filterByDates) {
                     focus.select("circle." + key)
                         .attr("value", d[key])
                         .attr("transform",
-                        "translate(" + x(d.datetime) + "," +
-                        y(d[key]) + ")");
+                            "translate(" + x(d.datetime) + "," +
+                            y(d[key]) + ")");
                 }
             }
 
             focus.select(".x")
                 .attr("transform",
-                "translate(" + x(d.datetime) + "," +
-                0 + ")")
+                    "translate(" + x(d.datetime) + "," +
+                    0 + ")")
                 .attr("y2", height);
 
             focus.select(".y")
                 .attr("transform",
-                "translate(" + width * -1 + "," +
-                y(d.play) + ")")
+                    "translate(" + width * -1 + "," +
+                    y(d.play) + ")")
                 .attr("x2", width + width);
 
             tooltip.select("#tooltip-title")
@@ -584,6 +450,26 @@ function update_graphs(filterByDates) {
     d3.json(url2, function (error, data) {
 
         console.log("data updated");
+
+        (function count_all() {
+
+            for (var i = 0; i < data.length; i++) {
+                for (var key in data[i]) {
+                    if (key != "datetime" && key != "total") {
+                        data[i].total = 0;
+                    }
+                }
+            }
+
+            for (var i = 0; i < data.length; i++) {
+                for (var key in data[i]) {
+                    if (key != "datetime" && key != "total") {
+                        data[i].total += data[i][key];
+                        //console.log(data[i].total);
+                    }
+                }
+            }
+        })();
 
         d3.selectAll('svg').remove();
         d3.select('#tooltip').select('div').remove();
@@ -612,34 +498,21 @@ function update_graphs(filterByDates) {
             };
         });
 
-        //This one for counting overall users
-        var count_total = function () {
-            var number = [];
-            // Fill array with zero values
-            for (var k = 0; k < stores[0].values.length; k++) {
-                number.push({
-                    datetime: data[k].datetime,
-                    store: 0
-                });
-            }
-            // Overwrite array values with new ones
-            for (var i = 0; i < stores.length; i++) {
-                for (var j = 0; j < stores[i].values.length; j++) {
-                    number[j].store += parseInt(stores[i].values[j].store);
-                }
-            }
-            return number;
-        };
-
         // Scale the range of the data again
         x.domain(d3.extent(data, function (d) {
             return d.datetime;
         }));
 
         y.domain([
-            0,
-            d3.max(count_total(), function (d) {
-                return Math.max(d.store);
+            d3.min(stores, function (c) {
+                return d3.min(c.values, function (v) {
+                    return v.store;
+                });
+            }),
+            d3.max(stores, function (c) {
+                return d3.max(c.values, function (v) {
+                    return v.store;
+                });
             })
         ]);
 
@@ -661,7 +534,7 @@ function update_graphs(filterByDates) {
             .call(make_x_axis()
                 .tickSize(-height, 0, 0)
                 .tickFormat("")
-        );
+            );
 
         // Draw vertical lines
         svg.append("g")
@@ -669,7 +542,7 @@ function update_graphs(filterByDates) {
             .call(make_y_axis()
                 .tickSize(-width, 0, 0)
                 .tickFormat("")
-        );
+            );
 
 
         // Add the X Axis
@@ -707,20 +580,6 @@ function update_graphs(filterByDates) {
             .style("stroke", function (d) {
                 return color(d.name);
             });
-
-        var store_total = svg.append("g")
-            .data(stores)
-            .attr("class", "graph total")
-            .attr("id", "total");
-
-        // Add the valueline path for stores.
-        store_total.append("path")
-            .attr("class", "line")
-            .attr("fill", "none")
-            .attr("d", function () {
-                return valueline(count_total());
-            })
-            .style("stroke", "#D62728");
 
         var svgElement = document.getElementsByClassName("chart");
         var svgElementPosition = svgElement[0].getBoundingClientRect();
@@ -777,24 +636,6 @@ function update_graphs(filterByDates) {
                 return d.name;
             });
 
-        var legend_section_total = legend.append("div")
-            .attr("class", "legend-item")
-            .attr({
-                "width": width / 4,
-                "height": height / 4
-            }).attr("data-store", "total")
-            .on("click", click_function)
-            .on("mouseover", mouseover)
-            .on("mouseout", mouseout);
-
-        legend_section_total.append("div")
-            .attr("class", "legend-swatch")
-            .style("background-color", "#D62728");
-
-        legend_section_total.append("div")
-            .attr("class", "legend-title")
-            .text("Total");
-
         // TOOLTIP
 
         var tooltip = d3.select("#tooltip")
@@ -844,26 +685,6 @@ function update_graphs(filterByDates) {
                 return formatLargeNumbers(d.values[d.values.length - 1].store);
             });
 
-        var tooltip_section_total = tooltip.append("div")
-            .data(count_total())
-            .attr("class", "tooltip-section total");
-
-        tooltip_section_total.append("div")
-            .attr("class", "tooltip-swatch")
-            .style("background-color", "#D62728");
-
-        tooltip_section_total.append("div")
-            .attr("class", "tooltip-title")
-            .attr("title", "Total")
-            .text("Total");
-
-        tooltip_section_total.append("div")
-            .attr("class", "tooltip-value")
-            .text(function () {
-                // return last value
-                return formatLargeNumbers(count_total()[count_total().length - 1].store);
-            });
-
         // don't know what's this for
         // Add the valueline path.
         //lineSvg.append("path")
@@ -902,24 +723,6 @@ function update_graphs(filterByDates) {
             })
             .attr("r", 4);
 
-        // append the x line
-        focus.append("line")
-            .data(count_total())
-            .attr("class", "x total")
-            .style("stroke", "#1B1B1B")
-            .style("stroke-dasharray", "3,3")
-            .style("opacity", 0.5)
-            .attr("y1", 0)
-            .attr("y2", height);
-
-        // append the circle at the intersection
-        focus.append("circle")
-            .data(count_total())
-            .attr("class", "total")
-            .style("fill", "#FFFFFF")
-            .style("stroke", "#D62728")
-            .attr("r", 4);
-
         // append the rectangle to capture mouse
         svg.append("rect")
             .data(stores)
@@ -954,21 +757,21 @@ function update_graphs(filterByDates) {
                     focus.select("circle." + key)
                         .attr("value", d[key])
                         .attr("transform",
-                        "translate(" + x(d.datetime) + "," +
-                        y(d[key]) + ")");
+                            "translate(" + x(d.datetime) + "," +
+                            y(d[key]) + ")");
                 }
             }
 
             focus.select(".x")
                 .attr("transform",
-                "translate(" + x(d.datetime) + "," +
-                0 + ")")
+                    "translate(" + x(d.datetime) + "," +
+                    0 + ")")
                 .attr("y2", height);
 
             focus.select(".y")
                 .attr("transform",
-                "translate(" + width * -1 + "," +
-                y(d.play) + ")")
+                    "translate(" + width * -1 + "," +
+                    y(d.play) + ")")
                 .attr("x2", width + width);
 
             tooltip.select("#tooltip-title")
@@ -985,13 +788,6 @@ function update_graphs(filterByDates) {
                     return formatLargeNumbers(value);
                 });
         }
-
-
-        //---------------------------
-
-        // Overall graph
-
-        // Create SVG element
 
     });
 }
@@ -1106,16 +902,10 @@ d3.select(window).on("resize", resize);
 function resize() {
     var svgElement = document.getElementsByClassName("chart");
     var svgElementPosition = svgElement[0].getBoundingClientRect();
-    //var totalElementPosition = totalElement[0].getBoundingClientRect();
 
     d3.select("#tooltip")
         .style({
             "left": svgElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px",
             "top": svgElementPosition.top + document.body.scrollTop + margin.top * 1.5 + "px"
         });
-    //d3.select("#tooltip_total")
-    //    .style({
-    //        "left": totalElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px",
-    //        "top": totalElementPosition.top + document.body.scrollTop + margin.top * 2 + "px"
-    //    });
 }
