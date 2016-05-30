@@ -34,6 +34,15 @@
             stroke-width: 0;
         }
 
+        .graph-section {
+            display: inline-block;
+        }
+
+        .graph-section > div {
+            display: inline-block;
+            margin-right: 4px;
+        }
+
         .tooltip,
         .legend {
             width: auto;
@@ -51,7 +60,7 @@
             pointer-events: none;
         }
 
-        .legend {
+        #legend, #legend_total {
             min-width: 60px;
             min-height: 60px;
             display: inline-block;
@@ -94,18 +103,6 @@
             opacity: .3;
         }
 
-        .right-bar {
-                      display: inline-block;
-                      vertical-align: top;
-                      list-style: none;
-                      margin: 0;
-                      padding: 0;
-                  }
-
-        .right-bar li {
-            margin-bottom: 10px;
-        }
-
     </style>
     <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.min.css"
           rel="stylesheet">
@@ -121,20 +118,18 @@
 
 <body>
 <div>
+    <div>
+        <input id="e1" name="e1">
+        <input type="hidden" id="input_start_date" value=""/>
+        <input type="hidden" id="input_end_date" value=""/>
+    </div>
     <div class="graph-section">
         <div class="chart"></div>
         <div id="tooltip"></div>
-        <ul class="right-bar">
-            <li>
-                <div id="legend"></div>
-            </li>
-        </ul>
+        <div id="legend"></div>
     </div>
-    <input id="e1" name="e1">
-    <input type="text" id="input_start_date" value=""/>
-    <input type="text" id="input_end_date" value=""/>
-    <div class="graph-section" style="visibility: hidden;">
-        <svg class="total"></svg>
+    <div class="graph-section">
+        <div class="total"></div>
         <div id="tooltip_total"></div>
         <div id="legend_total"></div>
     </div>
