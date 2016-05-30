@@ -273,8 +273,8 @@ function render(filterByDates) {
 
         var store_total = svg.append("g")
             .data(stores)
-            .attr("class", "graph-total")
-            .attr("id", "overall");
+            .attr("class", "graph total")
+            .attr("id", "total");
 
         // Add the valueline path for stores.
         store_total.append("path")
@@ -344,7 +344,11 @@ function render(filterByDates) {
             .attr({
                 "width": width / 4,
                 "height": height / 4
-            });
+            })
+            .attr("data-store", "total")
+            .on("click", click_function)
+            .on("mouseover", mouseover)
+            .on("mouseout", mouseout);
 
         legend_section_total.append("div")
             .attr("class", "legend-swatch")
@@ -746,8 +750,8 @@ function update_graphs(filterByDates) {
 
         var store_total = svg.append("g")
             .data(stores)
-            .attr("class", "graph-total")
-            .attr("id", "overall");
+            .attr("class", "graph total")
+            .attr("id", "total");
 
         // Add the valueline path for stores.
         store_total.append("path")
@@ -818,7 +822,10 @@ function update_graphs(filterByDates) {
             .attr({
                 "width": width / 4,
                 "height": height / 4
-            });
+            }).attr("data-store", "total")
+            .on("click", click_function)
+            .on("mouseover", mouseover)
+            .on("mouseout", mouseout);
 
         legend_section_total.append("div")
             .attr("class", "legend-swatch")
@@ -1070,7 +1077,7 @@ function mouseover() {
     }
 
     // Selection by store class is temporary decision
-    d3.selectAll(".legend-item.store").filter(function () {
+    d3.selectAll(".legend-item").filter(function () {
         // Check if current element is hidden
         if (!d3.select(this).classed("transparent")) {
             if (hidden) {
@@ -1120,7 +1127,7 @@ function click_function() {
             "legend-item-focused": true
         });
         show_graph(graph_id);
-        d3.selectAll(".legend-item.store").filter(function () {
+        d3.selectAll(".legend-item").filter(function () {
             if (!d3.select(this).classed("legend-item-focused")) {
                 d3.select(this).classed("transparent", true);
                 d3.selectAll(".graph").filter(function () {
@@ -1139,16 +1146,16 @@ d3.select(window).on("resize", resize);
 function resize() {
     var svgElement = document.getElementsByClassName("chart");
     var svgElementPosition = svgElement[0].getBoundingClientRect();
-    var totalElementPosition = totalElement[0].getBoundingClientRect();
+    //var totalElementPosition = totalElement[0].getBoundingClientRect();
 
     d3.select("#tooltip")
         .style({
             "left": svgElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px",
             "top": svgElementPosition.top + document.body.scrollTop + margin.top * 1.5 + "px"
         });
-    d3.select("#tooltip_total")
-        .style({
-            "left": totalElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px",
-            "top": totalElementPosition.top + document.body.scrollTop + margin.top * 2 + "px"
-        });
+    //d3.select("#tooltip_total")
+    //    .style({
+    //        "left": totalElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px",
+    //        "top": totalElementPosition.top + document.body.scrollTop + margin.top * 2 + "px"
+    //    });
 }
