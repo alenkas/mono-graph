@@ -33,8 +33,8 @@ var x = d3.time.scale().range([0, width]);
 var y = d3.scale.linear()
     .range([height, 0]);
 
-var y1 = d3.scale.linear()
-    .range([height, 0]);
+//var y1 = d3.scale.linear()
+//    .range([height, 0]);
 
 var color = d3.scale.category10();
 
@@ -45,8 +45,8 @@ var xAxis = d3.svg.axis().scale(x)
 var yAxis = d3.svg.axis().scale(y)
     .orient("left").ticks(3).tickFormat(d3.format("s"));
 
-var yAxisTotal = d3.svg.axis().scale(y1)
-    .orient("left").ticks(5).tickFormat(d3.format("s"));
+//var yAxisTotal = d3.svg.axis().scale(y1)
+//    .orient("left").ticks(5).tickFormat(d3.format("s"));
 
 // Define the line for store
 var valueline = d3.svg.line()
@@ -58,13 +58,13 @@ var valueline = d3.svg.line()
     });
 
 // Define the line for store
-var valueline_total = d3.svg.line()
-    .x(function (d) {
-        return x(d.datetime);
-    })
-    .y(function (d) {
-        return y1(d.value);
-    });
+//var valueline_total = d3.svg.line()
+//    .x(function (d) {
+//        return x(d.datetime);
+//    })
+//    .y(function (d) {
+//        return y1(d.value);
+//    });
 
 function make_x_axis() {
     return d3.svg.axis()
@@ -80,12 +80,12 @@ function make_y_axis() {
         .ticks(5);
 }
 
-function make_y_axis_total() {
-    return d3.svg.axis()
-        .scale(y1)
-        .orient("left")
-        .ticks(5);
-}
+//function make_y_axis_total() {
+//    return d3.svg.axis()
+//        .scale(y1)
+//        .orient("left")
+//        .ticks(5);
+//}
 
 //not sure if it's used
 //var lineSvg = svg.append("g");
@@ -151,22 +151,52 @@ function render(filterByDates) {
             };
         });
 
+        //y.domain([
+        //    d3.min(stores, function (c) {
+        //        return d3.min(c.values, function (v) {
+        //            return v.store;
+        //        });
+        //    }),
+        //    d3.max(stores, function (c) {
+        //        return d3.max(c.values, function (v) {
+        //            return v.store;
+        //        });
+        //    })
+        //]);
+
+
+        // Overall graph
+
+        //This one for counting overall users
+        var count_total = function () {
+            var number = [];
+            // Fill array with zero values
+            for (var k = 0; k < stores[0].values.length; k++) {
+                number.push({
+                    datetime: data[k].datetime,
+                    store: 0
+                });
+            }
+            // Overwrite array values with new ones
+            for (var i = 0; i < stores.length; i++) {
+                for (var j = 0; j < stores[i].values.length; j++) {
+                    number[j].store += parseInt(stores[i].values[j].store);
+                }
+            }
+            return number;
+        };
+
         x.domain(d3.extent(data, function (d) {
             return d.datetime;
         }));
 
         y.domain([
-            d3.min(stores, function (c) {
-                return d3.min(c.values, function (v) {
-                    return v.store;
-                });
-            }),
-            d3.max(stores, function (c) {
-                return d3.max(c.values, function (v) {
-                    return v.store;
-                });
+            0,
+            d3.max(count_total(), function (d) {
+                return Math.max(d.store);
             })
         ]);
+
 
         // Create SVG element
         var svg = d3.select(".chart")
@@ -187,6 +217,14 @@ function render(filterByDates) {
                 .tickSize(-height, 0, 0)
                 .tickFormat("")
         );
+
+        //// Draw vertical lines
+        //svg.append("g")
+        //    .attr("class", "y grid")
+        //    .call(make_y_axis()
+        //        .tickSize(-width, 0, 0)
+        //        .tickFormat("")
+        //);
 
         // Draw vertical lines
         svg.append("g")
@@ -233,10 +271,25 @@ function render(filterByDates) {
                 return color(d.name);
             });
 
+        var store_total = svg.append("g")
+            .data(stores)
+            .attr("class", "graph-total")
+            .attr("id", "overall");
+
+        // Add the valueline path for stores.
+        store_total.append("path")
+            .attr("class", "line")
+            .attr("fill", "none")
+            .attr("d", function () {
+                return valueline(count_total());
+            })
+            .style("stroke", "#000");
+
         var svgElement = document.getElementsByClassName("chart");
         var svgElementPosition = svgElement[0].getBoundingClientRect();
         console.log(svgElementPosition);
 
+        // LEGEND
 
         var legend = d3.select("#legend")
             .append('div')
@@ -286,6 +339,23 @@ function render(filterByDates) {
                 return d.name;
             });
 
+        var legend_section_total = legend.append("div")
+            .attr("class", "legend-item")
+            .attr({
+                "width": width / 4,
+                "height": height / 4
+            });
+
+        legend_section_total.append("div")
+            .attr("class", "legend-swatch")
+            .style("background-color", "#000");
+
+        legend_section_total.append("div")
+            .attr("class", "legend-title")
+            .text("total");
+
+        // TOOLTIP
+
         var tooltip = d3.select("#tooltip")
             .append("div")
             //.attr("id", "tooltip")
@@ -333,6 +403,26 @@ function render(filterByDates) {
                 return formatLargeNumbers(d.values[d.values.length - 1].store);
             });
 
+        var tooltip_section_total = tooltip.append("div")
+            .data(count_total())
+            .attr("class", "tooltip-section total");
+
+        tooltip_section_total.append("div")
+            .attr("class", "tooltip-swatch")
+            .style("background-color", "#000");
+
+        tooltip_section_total.append("div")
+            .attr("class", "tooltip-title")
+            .attr("title", "Total")
+            .text("Total");
+
+        tooltip_section_total.append("div")
+            .attr("class", "tooltip-value")
+            .text(function () {
+                // return last value
+                return formatLargeNumbers(count_total()[count_total().length - 1].store);
+            });
+
 
         // don't know what's this for
         // Add the valueline path.
@@ -372,6 +462,29 @@ function render(filterByDates) {
             })
             .attr("r", 4);
 
+
+        //var focus_total = svg.append("g")
+        //    .attr("class", "hover")
+        //    .style("display", "none");
+
+        // append the x line
+        focus.append("line")
+            .data(count_total())
+            .attr("class", "x total")
+            .style("stroke", "#1B1B1B")
+            .style("stroke-dasharray", "3,3")
+            .style("opacity", 0.5)
+            .attr("y1", 0)
+            .attr("y2", height);
+
+        // append the circle at the intersection
+        focus.append("circle")
+            .data(count_total())
+            .attr("class", "total")
+            .style("fill", "#FFFFFF")
+            .style("stroke", "#000")
+            .attr("r", 4);
+
         // append the rectangle to capture mouse
         svg.append("rect")
             .data(stores)
@@ -391,6 +504,26 @@ function render(filterByDates) {
                 focus.style("display", "none");
             })
             .on("mousemove", mousemove);
+
+        //svg.append("rect")
+        //    .data(count_total())
+        //    .attr({
+        //        "width": width,
+        //        "height": height
+        //    })
+        //    .attr("class", "rect-capture-mouse")
+        //    .style("fill", "none")
+        //    .style("pointer-events", "all")
+        //    .on("mouseover", function () {
+        //        tooltip.style("display", null);
+        //        focus.style("display", null);
+        //        //console.log(tooltip_total);
+        //    })
+        //    .on("mouseout", function () {
+        //        tooltip.style("display", "none");
+        //        focus.style("display", "none");
+        //    })
+        //    .on("mousemove", mousemove_total);
 
         function mousemove() {
             var x0 = x.invert(d3.mouse(this)[0]),
@@ -438,286 +571,45 @@ function render(filterByDates) {
                 });
         }
 
-
-        // Create SVG element
-        var total = d3.select(".total")
-            .attr({
-                "width": width + margin.left + margin.right,
-                "height": height + margin.top + margin.bottom
-            })
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-        // ------------------------------------------------------------------------------
-
-        // Overall graph
-
-        d3.select('#tooltip_total').select('div').remove();
-        d3.select("#legend_total").select('div').remove();
-
-
-        //This one for counting overall users
-        var count_total = function () {
-            var number = [];
-            // Fill array with zero values
-            for (var k = 0; k < stores[0].values.length; k++) {
-                number.push({
-                    datetime: data[k].datetime,
-                    value: 0
-                });
-            }
-            // Overwrite array values with new ones
-            for (var i = 0; i < stores.length; i++) {
-                for (var j = 0; j < stores[i].values.length; j++) {
-                    number[j].value += parseInt(stores[i].values[j].store);
-                }
-            }
-            return number;
-        };
-
-        y1.domain([
-            d3.min(count_total(), function (d) {
-                return Math.min(d.value);
-            }),
-            d3.max(count_total(), function (d) {
-                return Math.max(d.value);
-            })
-        ]);
-
-        // Create SVG element
-        var total = d3.select(".total")
-            .classed("updated", false)
-            .append("svg")
-            .attr({
-                "width": width + margin.left + margin.right,
-                "height": height + margin.top + margin.bottom
-            })
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        var totalElement = document.getElementsByClassName("total");
-        var totalElementPosition = totalElement[0].getBoundingClientRect();
-        console.log(totalElementPosition);
-
-
-        // Draw horizontal lines
-        total.append("g")
-            .attr("class", "x grid")
-            .attr("transform", "translate(0," + height + ")")
-            .call(make_x_axis()
-                .tickSize(-height, 0, 0)
-                .tickFormat("")
-        );
-
-        // Draw vertical lines
-        total.append("g")
-            .attr("class", "y grid")
-            .call(make_y_axis_total()
-                .tickSize(-width, 0, 0)
-                .tickFormat("")
-        );
-
-        // Add the X Axis
-        total.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis)
-            .selectAll("text")
-            .style("text-anchor", "end")
-            .attr({
-                "dx": "-.8em",
-                "dy": ".15em"
-            })
-            .attr("transform", "rotate(-45)");
-        // Add the Y Axis
-        total.append("g")
-            .attr("class", "y axis")
-            .call(yAxisTotal);
-
-        var store_total = total.append("g")
-            .data(stores)
-            .attr("class", "graph-total")
-            .attr("id", "overall");
-
-        // Add the valueline path for stores.
-        store_total.append("path")
-            .attr("class", "line")
-            .attr("fill", "none")
-            .attr("d", function () {
-                return valueline_total(count_total());
-            })
-            .style("stroke", "#000");
-
-        var legend_total = d3.select("#legend_total")
-            .append("div")
-            .attr("class", "legend")
-            .style("margin-top", margin.top + "px");
-
-        legend_total.append("div")
-            .attr("id", "legend-title")
-            .text("Stores overall")
-            .append("span")
-            .attr("id", "refresh")
-            .attr("class", "ui-icon ui-icon-arrowrefresh-1-e")
-            .on("click", update_graphs);
-
-        var legend_section_total = legend_total.append("div")
-            .attr("class", "legend-item")
-            .attr({
-                "width": width / 4,
-                "height": height / 4
-            });
-
-        //.on("click", click_function)
-        //.on("mouseover", mouseover)
-        //.on("mouseout", mouseout);
-
-        legend_section_total.append("div")
-            .attr("class", "legend-swatch")
-            .style("background-color", "#000");
-
-        legend_section_total.append("div")
-            .attr("class", "legend-title")
-            .text("Total");
-
-        var tooltip_total = d3.select("#tooltip_total")
-            .append("div")
-            .attr("class", "tooltip")
-            .style("display", "none")
-            .style({
-                "left": totalElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px",
-                "top": totalElementPosition.top + document.body.scrollTop + margin.top * 2 + "px"
-            });
-
-        tooltip_total.append("div")
-            .attr("id", "tooltip-title")
-            .style("font-weight", "bold")
-            .text("Total");
-
-        var tooltip_section_total = tooltip_total.append("div")
-            .data(count_total())
-            .attr("class", "tooltip-section");
-
-        tooltip_section_total.append("div")
-            .attr("class", "tooltip-swatch")
-            .style("background-color", "#000");
-
-        tooltip_section_total.append("div")
-            .attr("class", "tooltip-title")
-            .attr("title", "Total")
-            .text("Total");
-
-        tooltip_section_total.append("div")
-            .attr("class", "tooltip-value")
-            .text(function () {
-                // return last value
-                return formatLargeNumbers(count_total()[count_total().length - 1].value);
-            });
-
-        var focus_total = total.append("g")
-            .attr("class", "hover")
-            .style("display", "none");
-
-        // append the x line
-        focus_total.append("line")
-            .data(count_total())
-            .attr("class", "x")
-            .style("stroke", "#1B1B1B")
-            .style("stroke-dasharray", "3,3")
-            .style("opacity", 0.5)
-            .attr("y1", 0)
-            .attr("y2", height);
-
-        // append the circle at the intersection
-        focus_total.append("circle")
-            .data(count_total())
-            .attr("class", "total")
-            .style("fill", "#FFFFFF")
-            .style("stroke", "#000")
-            .attr("r", 4);
-
-        // append the rectangle to capture mouse
-        total.append("rect")
-            .data(count_total())
-            .attr({
-                "width": width,
-                "height": height
-            })
-            .attr("class", "rect-capture-mouse")
-            .style("fill", "none")
-            .style("pointer-events", "all")
-            .on("mouseover", function () {
-                tooltip_total.style("display", null);
-                focus_total.style("display", null);
-                //console.log(tooltip_total);
-            })
-            .on("mouseout", function () {
-                tooltip_total.style("display", "none");
-                focus_total.style("display", "none");
-            })
-            .on("mousemove", mousemove_total);
-
-        function mousemove_total() {
-            var x0 = x.invert(d3.mouse(this)[0]),
-                i = bisectDate(count_total(), x0, 1),
-                d0 = count_total()[i - 1],
-                d1 = count_total()[i],
-                d = x0 - d0.datetime > d1.datetime - x0 ? d1 : d0;
-
-            focus_total.select("circle.total")
-                .attr("value", d.value)
-                .attr("transform",
-                "translate(" + x(d.datetime) + "," +
-                y1(d.value) + ")");
-
-            focus_total.select(".x")
-                .attr("transform",
-                "translate(" + x(d.datetime) + "," +
-                0 + ")")
-                .attr("y2", height);
-
-            focus_total.select(".y")
-                .attr("transform",
-                "translate(" + width * -1 + "," +
-                y1(d.value) + ")")
-                .attr("x2", width + width);
-
-            tooltip_total.select("#tooltip-title")
-                .text(function () {
-                    var month_number = d.datetime.getMonth();
-                    var date = d.datetime.getDate() + " " + get_month(month_number) + " " + d.datetime.getFullYear();
-                    return date;
-                });
-
-            tooltip_total.selectAll(".tooltip-value")
-                .data(count_total())
-                .text(function () {
-                    var value = d3.select("circle.total").attr("value");
-                    return formatLargeNumbers(value);
-                });
-        }
-
-        d3.select("select")
-            //.data(stores)
-            .on("change", function (d, i) {
-                console.log(this);
-                var stores = color.domain().map(function (name) {
-                    return {
-                        name: name,
-                        values: data.map(function (d) {
-                            return {datetime: d.datetime, store: +d[name]};
-                        })
-                    };
-                });
-
-                var sel = d3.select("#date-option-total").node().value;
-                var chart = d3.select("#date-option-total").nextElementSibling;
-                console.log(chart);
-                stores.forEach(function (d) {
-                    d.values.splice(0, d.values.length - sel);
-                    updateLine(d, chart);
-                });
-                console.log(stores);
-            });
+        //function mousemove_total() {
+        //    var x0 = x.invert(d3.mouse(this)[0]),
+        //        i = bisectDate(count_total(), x0, 1),
+        //        d0 = count_total()[i - 1],
+        //        d1 = count_total()[i],
+        //        d = x0 - d0.datetime > d1.datetime - x0 ? d1 : d0;
+        //
+        //    focus.select("circle.total")
+        //        .attr("value", d.store)
+        //        .attr("transform",
+        //        "translate(" + x(d.datetime) + "," +
+        //        y(d.store) + ")");
+        //
+        //    focus.select(".x")
+        //        .attr("transform",
+        //        "translate(" + x(d.datetime) + "," +
+        //        0 + ")")
+        //        .attr("y2", height);
+        //
+        //    focus.select(".y")
+        //        .attr("transform",
+        //        "translate(" + width * -1 + "," +
+        //        y(d.store) + ")")
+        //        .attr("x2", width + width);
+        //
+        //    //tooltip.select(".total").select("")
+        //    //    .text(function () {
+        //    //        var month_number = d.datetime.getMonth();
+        //    //        var date = d.datetime.getDate() + " " + get_month(month_number) + " " + d.datetime.getFullYear();
+        //    //        return date;
+        //    //    });
+        //
+        //    tooltip.select(".total").select(".tooltip-value")
+        //        .data(count_total())
+        //        .text(function () {
+        //            var value = d3.select("circle.total").attr("value");
+        //            return formatLargeNumbers(value);
+        //        });
+        //}
 
     });
 }
@@ -756,20 +648,34 @@ function update_graphs(filterByDates) {
             };
         });
 
+        //This one for counting overall users
+        var count_total = function () {
+            var number = [];
+            // Fill array with zero values
+            for (var k = 0; k < stores[0].values.length; k++) {
+                number.push({
+                    datetime: data[k].datetime,
+                    store: 0
+                });
+            }
+            // Overwrite array values with new ones
+            for (var i = 0; i < stores.length; i++) {
+                for (var j = 0; j < stores[i].values.length; j++) {
+                    number[j].store += parseInt(stores[i].values[j].store);
+                }
+            }
+            return number;
+        };
+
         // Scale the range of the data again
         x.domain(d3.extent(data, function (d) {
             return d.datetime;
         }));
+
         y.domain([
-            d3.min(stores, function (c) {
-                return d3.min(c.values, function (v) {
-                    return v.store;
-                });
-            }),
-            d3.max(stores, function (c) {
-                return d3.max(c.values, function (v) {
-                    return v.store;
-                });
+            0,
+            d3.max(count_total(), function (d) {
+                return Math.max(d.store);
             })
         ]);
 
@@ -838,10 +744,25 @@ function update_graphs(filterByDates) {
                 return color(d.name);
             });
 
+        var store_total = svg.append("g")
+            .data(stores)
+            .attr("class", "graph-total")
+            .attr("id", "overall");
+
+        // Add the valueline path for stores.
+        store_total.append("path")
+            .attr("class", "line")
+            .attr("fill", "none")
+            .attr("d", function () {
+                return valueline(count_total());
+            })
+            .style("stroke", "#000");
+
         var svgElement = document.getElementsByClassName("chart");
         var svgElementPosition = svgElement[0].getBoundingClientRect();
         //console.log(svgElementPosition);
 
+        // LEGEND
 
         var legend = d3.select("#legend")
             .append('div')
@@ -892,6 +813,23 @@ function update_graphs(filterByDates) {
                 return d.name;
             });
 
+        var legend_section_total = legend.append("div")
+            .attr("class", "legend-item")
+            .attr({
+                "width": width / 4,
+                "height": height / 4
+            });
+
+        legend_section_total.append("div")
+            .attr("class", "legend-swatch")
+            .style("background-color", "#000");
+
+        legend_section_total.append("div")
+            .attr("class", "legend-title")
+            .text("total");
+
+        // TOOLTIP
+
         var tooltip = d3.select("#tooltip")
             .append("div")
             .attr("id", "tooltip")
@@ -939,6 +877,25 @@ function update_graphs(filterByDates) {
                 return formatLargeNumbers(d.values[d.values.length - 1].store);
             });
 
+        var tooltip_section_total = tooltip.append("div")
+            .data(count_total())
+            .attr("class", "tooltip-section total");
+
+        tooltip_section_total.append("div")
+            .attr("class", "tooltip-swatch")
+            .style("background-color", "#000");
+
+        tooltip_section_total.append("div")
+            .attr("class", "tooltip-title")
+            .attr("title", "Total")
+            .text("Total");
+
+        tooltip_section_total.append("div")
+            .attr("class", "tooltip-value")
+            .text(function () {
+                // return last value
+                return formatLargeNumbers(count_total()[count_total().length - 1].store);
+            });
 
         // don't know what's this for
         // Add the valueline path.
@@ -976,6 +933,24 @@ function update_graphs(filterByDates) {
             .style("stroke", function (d) {
                 return color(d.name);
             })
+            .attr("r", 4);
+
+        // append the x line
+        focus.append("line")
+            .data(count_total())
+            .attr("class", "x total")
+            .style("stroke", "#1B1B1B")
+            .style("stroke-dasharray", "3,3")
+            .style("opacity", 0.5)
+            .attr("y1", 0)
+            .attr("y2", height);
+
+        // append the circle at the intersection
+        focus.append("circle")
+            .data(count_total())
+            .attr("class", "total")
+            .style("fill", "#FFFFFF")
+            .style("stroke", "#000")
             .attr("r", 4);
 
         // append the rectangle to capture mouse
@@ -1049,249 +1024,8 @@ function update_graphs(filterByDates) {
 
         // Overall graph
 
-        d3.select('#tooltip_total').select('div').remove();
-        d3.select("#legend_total").select('div').remove();
-
-        // This one for counting overall users
-        var count_total = function () {
-            var number = [];
-            // Fill array with zero values
-            for (var k = 0; k < stores[0].values.length; k++) {
-                number.push({
-                    datetime: data[k].datetime,
-                    value: 0
-                });
-            }
-            // Overwrite array values with new ones
-            for (var i = 0; i < stores.length; i++) {
-                for (var j = 0; j < stores[i].values.length; j++) {
-                    number[j].value += parseInt(stores[i].values[j].store);
-                }
-            }
-            return number;
-        };
-
-        y1.domain([
-            d3.min(count_total(), function (d) {
-                return Math.min(d.value);
-            }),
-            d3.max(count_total(), function (d) {
-                return Math.max(d.value);
-            })
-        ]);
-
         // Create SVG element
-        var total = d3.select(".total")
-            .classed("updated", false)
-            .append("svg")
-            .attr({
-                "width": width + margin.left + margin.right,
-                "height": height + margin.top + margin.bottom
-            })
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-        var totalElement = document.getElementsByClassName("total");
-        var totalElementPosition = totalElement[0].getBoundingClientRect();
-        console.log(totalElementPosition);
-
-
-        // Draw horizontal lines
-        total.append("g")
-            .attr("class", "x grid")
-            .attr("transform", "translate(0," + height + ")")
-            .call(make_x_axis()
-                .tickSize(-height, 0, 0)
-                .tickFormat("")
-        );
-
-        // Draw vertical lines
-        total.append("g")
-            .attr("class", "y grid")
-            .call(make_y_axis_total()
-                .tickSize(-width, 0, 0)
-                .tickFormat("")
-        );
-
-        // Add the X Axis
-        total.append("g")
-            .attr("class", "x axis")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis)
-            .selectAll("text")
-            .style("text-anchor", "end")
-            .attr({
-                "dx": "-.8em",
-                "dy": ".15em"
-            })
-            .attr("transform", "rotate(-45)");
-        // Add the Y Axis
-        total.append("g")
-            .attr("class", "y axis")
-            .call(yAxisTotal);
-
-        var store_total = total.append("g")
-            .data(stores)
-            .attr("class", "graph-total")
-            .attr("id", "overall");
-
-        // Add the valueline path for stores.
-        store_total.append("path")
-            .attr("class", "line")
-            .attr("fill", "none")
-            .attr("d", function () {
-                return valueline_total(count_total());
-            })
-            .style("stroke", "#000");
-
-        var legend_total = d3.select("#legend_total")
-            .append("div")
-            .attr("class", "legend")
-            .style("margin-top", margin.top + "px");
-
-        legend_total.append("div")
-            .attr("id", "legend-title")
-            .text("Stores overall")
-            .append("span")
-            .attr("id", "refresh")
-            .attr("class", "ui-icon ui-icon-arrowrefresh-1-e")
-            .on("click", update_graphs);
-
-        var legend_section_total = legend_total.append("div")
-            .attr("class", "legend-item")
-            .attr({
-                "width": width / 4,
-                "height": height / 4
-            });
-
-        //.on("click", click_function)
-        //.on("mouseover", mouseover)
-        //.on("mouseout", mouseout);
-
-        legend_section_total.append("div")
-            .attr("class", "legend-swatch")
-            .style("background-color", "#000");
-
-        legend_section_total.append("div")
-            .attr("class", "legend-title")
-            .text("Total");
-
-        var tooltip_total = d3.select("#tooltip_total")
-            .append("div")
-            .attr("class", "tooltip")
-            .style("display", "none")
-            .style({
-                "left": totalElementPosition.left + document.body.scrollLeft + margin.left * 1.5 + "px",
-                "top": totalElementPosition.top + document.body.scrollTop + margin.top * 2 + "px"
-            });
-
-        tooltip_total.append("div")
-            .attr("id", "tooltip-title")
-            .style("font-weight", "bold")
-            .text("Total");
-
-        var tooltip_section_total = tooltip_total.append("div")
-            .data(count_total())
-            .attr("class", "tooltip-section");
-
-        tooltip_section_total.append("div")
-            .attr("class", "tooltip-swatch")
-            .style("background-color", "#000");
-
-        tooltip_section_total.append("div")
-            .attr("class", "tooltip-title")
-            .attr("title", "Total")
-            .text("Total");
-
-        tooltip_section_total.append("div")
-            .attr("class", "tooltip-value")
-            .text(function () {
-                // return last value
-                return formatLargeNumbers(count_total()[count_total().length - 1].value);
-            });
-
-        var focus_total = total.append("g")
-            .attr("class", "hover")
-            .style("display", "none");
-
-        // append the x line
-        focus_total.append("line")
-            .data(count_total())
-            .attr("class", "x")
-            .style("stroke", "#1B1B1B")
-            .style("stroke-dasharray", "3,3")
-            .style("opacity", 0.5)
-            .attr("y1", 0)
-            .attr("y2", height);
-
-        // append the circle at the intersection
-        focus_total.append("circle")
-            .data(count_total())
-            .attr("class", "total")
-            .style("fill", "#FFFFFF")
-            .style("stroke", "#000")
-            .attr("r", 4);
-
-        // append the rectangle to capture mouse
-        total.append("rect")
-            .data(count_total())
-            .attr({
-                "width": width,
-                "height": height
-            })
-            .attr("class", "rect-capture-mouse")
-            .style("fill", "none")
-            .style("pointer-events", "all")
-            .on("mouseover", function () {
-                tooltip_total.style("display", null);
-                focus_total.style("display", null);
-                //console.log(tooltip_total);
-            })
-            .on("mouseout", function () {
-                tooltip_total.style("display", "none");
-                focus_total.style("display", "none");
-            })
-            .on("mousemove", mousemove_total);
-
-        function mousemove_total() {
-            var x0 = x.invert(d3.mouse(this)[0]),
-                i = bisectDate(count_total(), x0, 1),
-                d0 = count_total()[i - 1],
-                d1 = count_total()[i],
-                d = x0 - d0.datetime > d1.datetime - x0 ? d1 : d0;
-
-            focus_total.select("circle.total")
-                .attr("value", d.value)
-                .attr("transform",
-                "translate(" + x(d.datetime) + "," +
-                y1(d.value) + ")");
-
-            focus_total.select(".x")
-                .attr("transform",
-                "translate(" + x(d.datetime) + "," +
-                0 + ")")
-                .attr("y2", height);
-
-            focus_total.select(".y")
-                .attr("transform",
-                "translate(" + width * -1 + "," +
-                y1(d.value) + ")")
-                .attr("x2", width + width);
-
-            tooltip_total.select("#tooltip-title")
-                .text(function () {
-                    var month_number = d.datetime.getMonth();
-                    var date = d.datetime.getDate() + " " + get_month(month_number) + " " + d.datetime.getFullYear();
-                    return date;
-                });
-
-            tooltip_total.selectAll(".tooltip-value")
-                .data(count_total())
-                .text(function () {
-                    var value = d3.select("circle.total").attr("value");
-                    return formatLargeNumbers(value);
-                });
-        }
     });
 }
 
